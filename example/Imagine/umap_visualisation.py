@@ -6,7 +6,11 @@ import pandas as pd
 from matplotlib import pyplot as plt
 from matplotlib.patches import Patch
 
+
 # LOLH objects
+import sys
+sys.path.append('../../python')
+
 import solver
 
 import visualizer
@@ -17,12 +21,12 @@ import histogram
 def plot_cell_types():
 
     # import the cell types
-    file_name = '../dataset/Imagine/cell_types.csv'
+    file_name = '../../dataset/Imagine/cell_types.csv'
     df_cell_types = pd.read_csv(file_name, index_col=0)
     df_cell_types.rename(columns={'cellType_final': 'Label'}, inplace=True)
 
     # import the UMAP 2d representation
-    file_name = '../dataset/Imagine/embedding_coord.csv'
+    file_name = '../../dataset/Imagine/umap_coordinates.csv'
     umap_coordinates = pd.read_csv(file_name, index_col = 0)
 
     colors = [(248, 118, 109), (232, 133, 38), (211, 146, 0), (183, 159, 0), (147, 170, 0), (94, 179, 0)]
@@ -92,7 +96,7 @@ def plot_cell_types():
 def plot_cell_macrotypes():
 
     # import the cell types
-    file_name = '../dataset/Imagine/cell_types_macro.csv'
+    file_name = '../../dataset/Imagine/cell_types_macro.csv'
     df_macro = pd.read_csv(file_name, index_col=0)
     df_macro.rename(columns={'cellType_macro': 'Label'}, inplace=True)
 
@@ -101,7 +105,7 @@ def plot_cell_macrotypes():
 
 
     # import the UMAP 2d representation
-    file_name = '../dataset/Imagine/embedding_coord.csv'
+    file_name = '../../dataset/Imagine/umap_coordinates.csv'
     umap_coordinates = pd.read_csv(file_name, index_col = 0)
 
      # define coordinates for label positions
@@ -158,6 +162,6 @@ def plot_cell_macrotypes():
     return
 
 
-plot_cell_types()
+# plot_cell_types()
 
-# plot_cell_macrotypes()
+plot_cell_macrotypes()

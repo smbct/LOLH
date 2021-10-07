@@ -610,44 +610,44 @@ class Solver:
     def compute_nondominated_atoms(self, atoms):
 
         # return a list of atoms that are not dominated (based on their individual score)
-        
+
         inst = self.instance
-        
+
         sorted_atoms = atoms.copy()
 
         sorted_atoms.sort(key = lambda atom_ind: (inst.atom_score[atom_ind][0], -inst.atom_score[atom_ind][1]))
 
         nondominated_atoms = [sorted_atoms[0]]
         for ind_atom in sorted_atoms[1:]:
-            
+
             new_score = inst.atom_score[ind_atom]
             last_score = inst.atom_score[nondominated_atoms[-1]]
-            
+
             dominated = True
-            
+
             if new_score[0] == last_score[0] and new_score[1] == last_score[1]:
                 dominated = False
-            
+
             if new_score[0] > last_score[0] and new_score[1] > last_score[1]:
                 dominated = False
-                
+
             if not dominated:
                 nondominated_atoms.append(ind_atom)
-                
+
         return nondominated_atoms
-        
+
     #---------------------------------------------------------------------------
     def compute_relative_atom_area(self, nondominated_atoms):
 
-        # compute the relative area from a list of nondominated atoms        
+        # compute the relative area from a list of nondominated atoms
 
-        inst = self.instance       
+        inst = self.instance
 
         prec_score = inst.atom_score[nondominated_atoms[0]]
-    
+
         # first square, from the bottom to the first point
         relative_area = prec_score[1]*(inst.n_positives()-prec_score[0])
-        
+
         for ind_atom in nondominated_atoms[1:]:
             current_score = inst.atom_score[ind_atom]
             relative_area += (current_score[1]-prec_score[1])*(inst.n_positives()-current_score[0])

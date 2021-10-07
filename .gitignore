@@ -33,3 +33,6 @@
 
 # Datsets
 dataset/*
+
+# python
+python/__pycache__

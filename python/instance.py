@@ -200,7 +200,7 @@ class Instance:
     #---------------------------------------------------------------------------
     def get_atom(self, atom_index):
         return self.atoms[atom_index]
-    
+
     #---------------------------------------------------------------------------
     def has_atom(self, atom):
         return atom in self.atoms
@@ -214,6 +214,20 @@ class Instance:
         res = ''
 
         return res
+
+    #---------------------------------------------------------------------------
+    def compute_rule_error(self, rule, index) -> float:
+
+        sample = self.dataset.loc[index]
+
+        error = 0
+        for atom_index in rule:
+            atom = self.atoms[atom_index]
+            if sample[atom[0]] != atom[1]:
+                error += 1
+
+        return error
+
 
     #---------------------------------------------------------------------------
     @staticmethod
@@ -334,16 +348,16 @@ class Instance:
         for barcode in dataset.index:
 
             # filter out the predecessors based on the target value
-            if pred_neq == 0 or (pred_neq == 1 and dataset[gene_label][barcode] != value) or (pred_neq == 2 and dataset[gene_label][barcode] == value):   
+            if pred_neq == 0 or (pred_neq == 1 and dataset[gene_label][barcode] != value) or (pred_neq == 2 and dataset[gene_label][barcode] == value):
 
                 # compute successors
                 successors = (transitions.loc[transitions['T-1'] == barcode])['T']
-    
+
                 # compute the number of successors verifying the target value
                 pos_suc = dataset.loc[successors,gene_label] == value
-    
+
                 if pos_suc.shape[0] > 0:
-    
+
                     if ratio <= -0.5:
                         positive_barcodes.append(barcode)
                     else:
@@ -366,7 +380,7 @@ class Instance:
     @staticmethod
     def create_regulation_instance_delay(dataset, transitions, gene_label, value, ratio, delay, pred_neq = 0):
 
-        print('test delay')        
+        print('test delay')
 
         # compute a graph on the transitions
         row_index = {}
