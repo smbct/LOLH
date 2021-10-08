@@ -49,6 +49,8 @@ LOLH_rule, _ = solver.select_best_atoms_threshold(score_thresold)
 
 
 
+
+
 ################################################################################
 # display the atom scores
 fig, ax = plt.subplots()
@@ -57,7 +59,7 @@ other_atoms_indexes = [atom_index for atom_index in range(instance.n_atoms()) if
 
 ax.scatter([instance.atom_score[atom_index][0] for atom_index in LOLH_rule], [instance.atom_score[atom_index][1] for atom_index in LOLH_rule], marker='o', color='red', s=4, label='atomes sélectionnés', zorder=2)
 
-ax.scatter([instance.atom_score[atom_index][0] for atom_index in other_atoms_indexes], [instance.atom_score[atom_index][1] for atom_index in other_atoms_indexes], marker='x', zorder=1, label='autres atomes')
+ax.scatter([instance.atom_score[atom_index][0] for atom_index in other_atoms_indexes], [instance.atom_score[atom_index][1] for atom_index in other_atoms_indexes], marker='x', zorder=1, label='autres atomes', alpha=0.7)
 
 # equation score = 0
 ax.plot([0, instance.n_positives()], [0, instance.n_negatives()], color='black', label='score=0.0', zorder=3)
@@ -75,7 +77,9 @@ ax.set_xlabel('erreur positive')
 ax.set_ylabel('erreur négative')
 # ax.set_title('atoms positive and negative scores')
 
-ax.legend()
+ax.legend(loc='lower right')
+
+
 
 
 
@@ -88,6 +92,8 @@ visualizer.plot_histograms(ax, histograms, True)
 ax.set_ylim((0, 0.3))
 
 
+
+
 ################################################################################
 # display the UMAP with LOLH rule score on the cells
 
@@ -96,6 +102,7 @@ sorted_cell_indexes = list(umap_coordinates.index)
 sorted_cell_indexes.sort(key=lambda index: cell_scores[index], reverse=True)
 umap_coordinates = umap_coordinates.loc[sorted_cell_indexes]
 
+# fig, ax = plt.subplots(dpi=400)
 fig, ax = plt.subplots()
 
 plasma = cm.get_cmap('plasma_r', 256)
@@ -110,6 +117,10 @@ cbar = ax.get_figure().colorbar(cm.ScalarMappable(norm=cnorm, cmap=plasma), ax=a
 cbar.set_label('Erreur de couverture')
 
 umap_limits = (ax.get_xlim(), ax.get_ylim())
+
+
+
+
 
 ################################################################################
 # selection of the cells that are not NK, with a matching error <= 15
@@ -129,5 +140,32 @@ ax.set_xlim(umap_limits[0])
 ax.set_ylim(umap_limits[1])
 cbar = ax.get_figure().colorbar(cm.ScalarMappable(norm=cnorm, cmap=plasma), ax=ax)
 cbar.set_label('Erreur de couverture')
+
+
+
+
+
+################################################################################
+# list all the sub-rules with a null matching error (perfect match)
+print('list of all the sub rules with perfect match:\n')
+sub_df = df.loc[:,[instance.get_atom(atom_index)[0] for atom_index in LOLH_rule]]
+sub_rules = []
+for pos_sample in instance._pos_samples:
+    sub_rule = []
+    for atom_index in LOLH_rule:
+        atom = instance.get_atom(atom_index)
+        if sub_df[atom[0]][pos_sample] == atom[1]:
+            sub_rule.append(atom_index)
+    sub_rules.append(sub_rule)
+    # print(pos_sample, ': ', [instance.get_atom(atom_index) for atom_index in sub_body])
+
+unique_sub, counts = np.unique(np.asarray(sub_rules), return_counts=True)
+res = list(zip(counts, unique_sub))
+res.sort(key=lambda elt:elt[0], reverse=True)
+for elt in res:
+    print(elt)
+    print('\n')
+
+
 
 plt.show()
