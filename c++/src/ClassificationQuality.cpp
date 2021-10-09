@@ -762,3 +762,201 @@ void ClassificationQuality::computeRegulQuality(DataFrame<uint>& dataset, NGraph
   cout << "total computation time: " << chrono::duration_cast<chrono::milliseconds>(stop-start).count() << endl;
 
 }
+
+/*----------------------------------------------------------------------------*/
+void ClassificationQuality::computeAtomRegulQuality(DataFrame<uint>& dataset, NGraph successors, double trRate, uint predNeq, string output_filename) {
+
+  #if DEBUG_LOG == 1
+  cout << "n genes: " << dataset.nColumns() << endl;
+  #endif
+
+  uint nVar = dataset.nColumns();
+
+  #if DEBUG_REDUCTION == 1
+  nVar = NVAR_DEBUG;
+  #endif
+
+  /* list of atoms to compute */
+  vector<pair<uint,uint>> target;
+
+  // for(uint ind = 0; ind <= dataset.nColumns()/*10*/; ind ++) {
+  //   target.push_back(pair<uint,uint>(ind, 0));
+  //   target.push_back(pair<uint,uint>(ind, 1));
+  // }
+
+  for(uint ind = 0; ind < nVar; ind ++) {
+    /* adaptive discretization */
+    uint nVal = dataset.nUnique(ind);
+    for(uint val = 0; val < nVal; val ++) {
+      target.push_back(pair<uint,uint>(ind, val));
+    }
+  }
+
+
+  /* output */
+  vector<string> output(target.size());
+
+
+  #if DEBUG_LOG == 1
+  uint nN = 0;
+  for(auto& elt: successors) {
+    nN += static_cast<uint>(elt.size());
+  }
+  cout << "mean n neighbours: " << static_cast<double>(nN)/static_cast<double>(successors.size()) << endl;
+  cout << "n transitions: " << nN << endl;
+  #endif
+
+  /* computation time */
+  auto start = chrono::steady_clock::now();
+
+  #if DEBUG_LOG == 1
+  unsigned int k = 0;
+  #endif
+
+  #if USE_OPENMP == 1
+  #pragma omp parallel num_threads(N_THREADS)
+  {
+  #pragma omp for
+  #endif
+
+  for(unsigned int targetIndex = 0; targetIndex < target.size(); targetIndex ++) {
+
+    auto& elt = target[targetIndex];
+
+    // auto start = chrono::steady_clock::now();
+
+    /* index of the feature to exclude */
+    #if DEBUG_LOG == 1
+    string debug_str;
+    debug_str += "target feature: " + dataset.getColLabel(elt.first) + "\n";
+    debug_str += "target feature index: " + to_string(elt.first) + "\n";
+    debug_str += "target value: " + to_string(elt.second) + "\n";
+    #endif
+
+
+    /*------------------------------------------------------------------------*/
+    /* create the classification instance based on the transition list */
+
+    /* create the class vector */
+    vector<bool> classVector(dataset.nRows(), false);
+    // auto start2 = chrono::steady_clock::now();
+
+    uint nPos = Instance::initRegulationClass(dataset, successors, elt.first, elt.second, trRate, predNeq, classVector);
+    // auto stop2 = chrono::steady_clock::now();
+    // cout << "init instance time: " << chrono::duration_cast<chrono::milliseconds>(stop2-start2).count() << endl;
+
+    #if DEBUG_LOG == 1
+    debug_str += "Instance positives/negatives: " + to_string(nPos) + " " + to_string(classVector.size()-nPos) + "\n";
+    #endif
+
+    /* output class vector */
+    /*if(elt.second > 0) {
+      ofstream file("classes_" + dataset.getColLabel(elt.first) + "_" + to_string(elt.second) + ".txt");
+      file << nPos << endl;
+      for(uint ind = 0; ind < classVector.size(); ind ++) {
+        if(classVector[ind]) {
+          file << dataset.getRowLabel(ind) << endl;
+        }
+      }
+      for(uint ind = 0; ind < classVector.size(); ind ++) {
+        if(!classVector[ind]) {
+          file << dataset.getRowLabel(ind) << endl;
+        }
+      }
+      file.close();
+    }*/
+
+
+    /*------------------------------------------------------------------------*/
+    /* compute cluster frequencies */
+    // map<string, int> labelFreq;
+    // for(auto& label : labels) {
+    //   labelFreq.insert(pair<string, int>(label, 0));
+    // }
+    // for(unsigned int ind = 0; ind < classVector.size(); ind ++) {
+    //   if(classVector[ind]) {
+    //     labelFreq[ cellLabel[dataset.getRowLabel(ind)] ] += 1;
+    //   }
+    // }
+
+    /* make sure the instance is not ill conditioned */
+    if(nPos > 0 && nPos < classVector.size()) {
+
+      // Instance instance(dataset, classVector, 2);
+      Instance instance(dataset, classVector); /* previously mistake here: not pre-defined n values */
+
+      /*------------------------------------------------------------------------*/
+      /* instance tuning */
+      // vector<bool> classVectorModified;
+      // Solver::tuneInstance(instance, bodyLength, 0.17, classVector, classVectorModified);
+      // Instance instanceModified(dataset, classVectorModified, 2);
+      /*------------------------------------------------------------------------*/
+
+
+      #if DEBUG_LOG == 1
+      debug_str +=  "instance nPos: " + to_string(instance.nPositives()) + "\n";
+      debug_str +=  "instance nNeg: " + to_string(instance.nNegatives()) + "\n";
+      #endif
+
+      Solver solver(instance);
+
+      /*--------------------------------------------------------------------------*/
+      /* computation the extreme points and the farthest */
+      vector<uint> atoms;
+      vector<uint> nonDominatedAtoms;
+      Combinatorics::generateRange(instance.nAtoms(), atoms);
+      solver.computeNonDominatedAtoms(atoms, nonDominatedAtoms);
+      double relativeArea = solver.computeRelativeAreaAtoms(nonDominatedAtoms);
+
+      #if DEBUG_LOG == 1
+      debug_str += "Relative area: " + to_string(relativeArea) + "\n";
+      #endif
+
+      output[targetIndex] = dataset.getColLabel(elt.first) + " " + to_string(elt.second) + " " + to_string(relativeArea) + " " + to_string(instance.nPositives()) + " " + to_string(instance.nNegatives()) /*+ " #"*/;
+      // for(auto& label: labels) {
+      //   output[targetIndex] += label + ":" + to_string(labelFreq[label]) + ";";
+      // }
+
+
+    } else {
+
+      output[targetIndex] = dataset.getColLabel(elt.first) + " " + to_string(elt.second) + " -1 " + to_string(nPos) + " " + to_string(classVector.size()-nPos);
+      // for(auto& label: labels) {
+      //   output[targetIndex] += ":" + to_string(labelFreq[label]) + ";";
+      // }
+
+    }
+
+
+    // auto stop = chrono::steady_clock::now();
+    // cout << "gene computation time: " << chrono::duration_cast<chrono::milliseconds>(stop-start).count() << endl;
+
+    #if DEBUG_LOG == 1
+    debug_str += "\n";
+    cout << debug_str << endl;
+    #endif
+
+    #if DEBUG_LOG == 1
+    k += 1;
+    cout << endl << endl << k << " atoms over " << target.size() << endl << endl << endl;
+    #endif
+
+  }
+
+  #if USE_OPENMP == 1
+  }
+  #endif
+
+  /* output file containing the area */
+  ofstream file(output_filename);
+
+  for(auto& line: output) {
+    file << line << endl;
+  }
+  file.close();
+
+
+  auto stop = chrono::steady_clock::now();
+  cout << "total computation time: " << chrono::duration_cast<chrono::milliseconds>(stop-start).count() << endl;
+
+}
