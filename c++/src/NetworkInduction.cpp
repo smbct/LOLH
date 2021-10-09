@@ -331,7 +331,7 @@ void NetworkInduction::computeRegulationNetwork(DataFrame<uint>& dataset, NGraph
         output[targetIndex] += " " + to_string(atomsNetworkScores[ind]) + " " + to_string(instance.getAtomPosScore(atomsNetwork[ind])) + " " + to_string(instance.getAtomNegScore(atomsNetwork[ind]));
       }
 
-    } else { /* otherwise register a special value */
+    } else { /* otherwise record a special value */
 
       output[targetIndex] = dataset.getColLabel(elt.first) + " " + to_string(elt.second) + " " + to_string(nPos) + " " + to_string(classVector.size()-nPos);
     }

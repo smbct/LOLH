@@ -53,6 +53,16 @@ class ClassificationQuality {
      */
     static void computeRegulQuality(DataFrame<uint>& dataset, NGraph successors, uint bodyLength, double trRate, uint predNeq, std::string output_filename);
 
+    /*!
+     * \brief compute the quality of the regulation instance: quality as relative area computed directly from the atoms
+     * \param dataset dataset containing gene expressions
+     * \param successors the glist of successors from the neighborhood graph for each cell
+     * \param parameter: trRate percentage of successors verifying the right value to consider as a transition
+     * \param parameter: predNeq 1 if transitions are extracted only when the predecessor state is not equal to the target value, 2 if transitions extracted whene the value is equal, 0 otherwise
+     * \param output_filename name of the output file
+     */
+    static void computeAtomRegulQuality(DataFrame<uint>& dataset, NGraph successors, double trRate, uint predNeq, std::string output_filename);
+
 
 
   private: /* private methods */

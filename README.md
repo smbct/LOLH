@@ -18,4 +18,12 @@ Part of the analysis associated to the selection of cells in the demo relies on 
 
 ## Examples
 
-- Imagine dataset: http://doi.org/10.5281/zenodo.4730807
+### artificial dataset:
+
+Randomly generated LOLH instances.
+
+### Imagine dataset:
+
+A pbmc matrix obtained by Imagine institute (https://www.institutimagine.org/fr)
+
+-> http://doi.org/10.5281/zenodo.4730807
