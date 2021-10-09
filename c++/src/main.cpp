@@ -3,6 +3,7 @@
 #include "Utils.hpp"
 #include "ClassificationQuality.hpp"
 #include "NetworkInduction.hpp"
+#include "Parameters.hpp"
 
 #include "Solver.hpp"
 
@@ -11,6 +12,7 @@
 #include "LinearGraph.hpp"
 
 using namespace std;
+
 
 /*----------------------------------------------------------------------------*/
 void regulCorrelationsExperiment() {
@@ -322,59 +324,225 @@ void transitionEmbeddingTest() {
 
 }
 
+
+// /*----------------------------------------------------------------------------*/
+// int main(int argc, char* argv[]) {
+//
+//   Utils::getInstance().initRand(42);
+//
+//   /* rapid example: use the gene clustering method to compute different logic rules corresponding to the gene clusters */
+//
+//   DataFrame<uint> dataset;
+//   // dataset.loadFromCSV("../../Learning/IMAGINE_dataset/dataset/IMAGINE_normalised_discrete_adaptive_NK.csv");
+//   dataset.loadFromCSV("../../Learning/IMAGINE_dataset/dataset/IMAGINE_normalised_discrete_adaptive.csv");
+//   dataset.computeUniqueVal();
+//
+//   cout << dataset.getRowLabel(0) << endl;
+//
+//   /* load the cell types, to know which is NK */
+//   DataFrame<string> cellTypes;
+//   cellTypes.loadFromCSV("../../Learning/IMAGINE_dataset/dataset/cell_types.csv");
+//
+//   /* list of cells that are not NK: true == not NK */
+//   vector<bool> negativeCells(dataset.nRows(), true);
+//   for(uint indRow = 0; indRow < cellTypes.nRows(); indRow ++) {
+//     if(cellTypes.getData(indRow, 0) == "NK") {
+//       negativeCells[dataset.getRowIndex(cellTypes.getRowLabel(indRow))] = false;
+//     }
+//   }
+//
+//
+//   NetworkInduction::computeNetwork(dataset, 0.3, "res/coexpr_network_NK_exclude.txt", &negativeCells);
+//
+//   //NetworkInduction::computeNetwork(dataset, 0.5, "res/coexpr_network_global.txt");
+//
+//
+//
+//   // LinearGraph graph(dataset);
+//   // graph.computeGraph(0.5, "res/linear_graph.txt");
+//
+//
+//   // regulCorrelationsExperiment();
+//   // transitionEmbeddingTest();
+//
+//
+//   // coexpressionNetworkExperiment();
+//
+//   // debugging();
+//
+//   // if(argc > 1) {
+//   //
+//   // cout << atoi(argv[1]) << endl;
+//   // } else {
+//   //
+//   // }
+//
+//
+//   return 0;
+//
+// }
+
+
 /*----------------------------------------------------------------------------*/
-int main(int argc, char* argv[]) {
+Parameters parametersExtraction(int argc, char* argv[]) {
 
-  Utils::getInstance().initRand(42);
+  /* extraction of the commands */
+  Parameters param;
 
-  /* rapid example: use the gene clustering method to compute different logic rules corresponding to the gene clusters */
+  for(int index = 1; index < argc; index ++) {
 
+    string argument = argv[index];
+
+    if(argument == "-d") {
+      param.debug = true;
+    } else if(argument == "-v") {
+      param.verbose = true;
+    } else if(argument == "-r") {
+        param.coexpression = false;
+    } else if(argument == "-cq") {
+      param.compute_network = false;
+    } else if(argument == "-im") {
+      if(index < argc-1) {
+        param.input_matrix = argv[index+1];
+        index ++;
+      }
+    } else if(argument == "-o") {
+      if(index < argc-1) {
+        param.output_file = argv[index+1];
+        index ++;
+      }
+    } else if(argument == "-t") {
+      if(index < argc-1) {
+        param.threshold = stod(string(argv[index+1]));
+        index ++;
+      }
+    } else if(argument == "-it") {
+      if(index < argc-1) {
+        param.input_transitions = argv[index+1];
+        index ++;
+      }
+    } else if(argument == "-tr") {
+      if(index < argc-1) {
+        param.transition_rate = stod(string(argv[index+1]));
+        index ++;
+      }
+    } else if(argument == "-pnq") {
+      if(index < argc-1) {
+        param.predecessor_neq = stoi(string(argv[index+1]));
+        index ++;
+      }
+    } else if(argument == "-td") {
+      if(index < argc-1) {
+        param.transition_delay = stoi(string(argv[index+1]));
+        index ++;
+      }
+    } else if(argument == "-h") {
+      cout << "usage: " << endl;
+      cout << "-d: execute the debug function" << endl;
+      cout << "-v: display additional information on the computation" << endl;
+      cout << "-r: compute the regulation network, if not, compute the coexpression network instead" << endl;
+      cout << "-cq: only compute the instance quality, otherwise compute the network" << endl;
+      cout << "-im: input matrix file (csv singl cell matrix)" << endl;
+      cout << "-o: output file (gene network)" << endl;
+      cout << "-t: selection threshold: 0. <= threshold <= 1." << endl;
+      cout << "-it: input transitions file, for dynamic network only" << endl;
+      cout << "-tr: transition rate between 0 and 1, or -1.: proportion of successors of a state required to verify the learned atom, to consider the state as positive, -1.: must be verified at least once" << endl;
+      cout << "-pnq: 0 if the predecessor can be different or equal to the learned atom, 1 if it should be different, 2 if it should be equal" << endl;
+      cout << "-td: transition delay (integer), > 1: length of the paths where the extremities are considered as a transition" << endl;
+    } else {
+      cout << "argument " << argument << " not recognised" << endl;
+    }
+
+  }
+
+  return param;
+
+}
+
+/*----------------------------------------------------------------------------*/
+void debug() {
+
+  cout << "debugging function" << endl;
+
+}
+
+/*----------------------------------------------------------------------------*/
+void computeRegulation(Parameters param) {
+
+  /* load the discretized single cell matrix */
   DataFrame<uint> dataset;
-  // dataset.loadFromCSV("../../Learning/IMAGINE_dataset/dataset/IMAGINE_normalised_discrete_adaptive_NK.csv");
-  dataset.loadFromCSV("../../Learning/IMAGINE_dataset/dataset/IMAGINE_normalised_discrete_adaptive.csv");
+  dataset.loadFromCSV(param.input_matrix);
   dataset.computeUniqueVal();
 
-  cout << dataset.getRowLabel(0) << endl;
+  /* load the transitions file */
+  DataFrame<string> transitions;
+  transitions.loadFromCSV(param.input_transitions);
 
-  /* load the cell types, to know which is NK */
-  DataFrame<string> cellTypes;
-  cellTypes.loadFromCSV("../../Learning/IMAGINE_dataset/dataset/cell_types.csv");
+  /* create the transition */
+  NGraph successors;
+  DataFrame<uint>::createNeighbourhoodGraph(dataset, transitions, param.transition_delay, successors);
 
-  /* list of cells that are not NK: true == not NK */
-  vector<bool> negativeCells(dataset.nRows(), true);
-  for(uint indRow = 0; indRow < cellTypes.nRows(); indRow ++) {
-    if(cellTypes.getData(indRow, 0) == "NK") {
-      negativeCells[dataset.getRowIndex(cellTypes.getRowLabel(indRow))] = false;
-    }
+  if(param.compute_network) {
+    NetworkInduction::computeRegulationNetwork(dataset, successors, param.transition_rate, param.predecessor_neq, param.threshold, param.output_file);
+  } else {
+
   }
 
 
-  NetworkInduction::computeNetwork(dataset, 0.3, "res/coexpr_network_NK_exclude.txt", &negativeCells);
+}
 
-  //NetworkInduction::computeNetwork(dataset, 0.5, "res/coexpr_network_global.txt");
+/*----------------------------------------------------------------------------*/
+void computeCoexpression(Parameters param) {
+
+  DataFrame<uint> dataset;
+  dataset.loadFromCSV(param.input_matrix);
+  dataset.computeUniqueVal();
+
+  if(param.compute_network) {
+    ClassificationQuality::computeAtomCoexprQuality(dataset, param.output_file);
+  } else {
+    NetworkInduction::computeNetwork(dataset, param.threshold, param.output_file);
+  }
+
+}
 
 
 
-  // LinearGraph graph(dataset);
-  // graph.computeGraph(0.5, "res/linear_graph.txt");
+/*----------------------------------------------------------------------------*/
+int main(int argc, char* argv[]) {
 
+  cout << "*******************************************************************" << endl;
+  cout << "        Computation of a gene network with LOLH algorithm          " << endl;
+  cout << "*******************************************************************" << endl;
 
-  // regulCorrelationsExperiment();
-  // transitionEmbeddingTest();
+  Utils::getInstance().initRand(42);
 
+  Parameters param = parametersExtraction(argc, argv);
 
-  // coexpressionNetworkExperiment();
+  if(param.debug) {
+    debug();
+  } else {
+    if(param.input_matrix.size() > 0 && param.output_file.size() > 0 && param.threshold >= 0) {
+      if(param.coexpression) {
+        computeCoexpression(param);
+      } else {
+        computeRegulation(param);
+      }
+    }
+  }
 
-  // debugging();
-
-  // if(argc > 1) {
+  // if(input_file.size() > 0 && output_file.size() > 0 && threshold >= 0) {
   //
-  // cout << atoi(argv[1]) << endl;
-  // } else {
+  //   cout << "input file: " << input_file << endl;
+  //   cout << "output file: " << output_file << endl;
+  //   cout << "threshold: " << threshold << endl;
   //
+  //   DataFrame<uint> dataset;
+  //   dataset.loadFromCSV(input_file);
+  //   dataset.computeUniqueVal();
+  //
+  //   NetworkInduction::computeNetwork(dataset, threshold, output_file);
   // }
 
-
   return 0;
-
 }

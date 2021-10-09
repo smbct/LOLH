@@ -544,7 +544,7 @@ uint Instance::initRegulationClass(DataFrame<uint>& dataset, NGraph& graph, uint
 
 
 
-      /* if the target atom is detected in enough  successors, the sample is considered as positive */
+      /* if the target atom is detected in enough successors, the sample is considered as positive */
       if( (proportion <= -0.5 and occurences > 0) || (static_cast<double>(occurences) / static_cast<double>(graph[indCell].size()) >= proportion) ) {
         classVector[indCell] = true;
         nPos ++;
