@@ -16,6 +16,9 @@ cd '../../dataset/' && mkdir 'Imagine'
 
 cd 'Imagine'
 
+mkdir 'coexpression'
+mkdir 'cell_classification'
+
 # download all the files from zenodo
 
 wget $link$celltypes_file'?download=1' -O 'cell_types.csv'

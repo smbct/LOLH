@@ -93,7 +93,39 @@ Parameters parametersExtraction(int argc, char* argv[]) {
 /*----------------------------------------------------------------------------*/
 void debug() {
 
+  /* NK classification test */
+
   cout << "debugging function" << endl;
+
+  string matrix_filename = "../dataset/Imagine/discrete_matrix.csv";
+  string celltypes_filename = "../dataset/Imagine/cell_types.csv";
+
+  DataFrame<uint> dataset;
+  dataset.loadFromCSV(matrix_filename);
+  dataset.computeUniqueVal();
+
+  DataFrame<string> labels;
+  labels.loadFromCSV(celltypes_filename);
+
+  vector<bool> classVector(dataset.nRows(), false);
+  vector<uint> features;
+
+  uint nPos = Instance::initClusterClass(dataset, labels, "NK", classVector);
+
+  Instance instance(dataset, classVector);
+
+  Solver solver(instance);
+
+  vector<uint> atomIndexes;
+  vector<double> atomScores;
+
+  double selectionThreshold = 0.55;
+  solver.computeBestAtomsThreshold(selectionThreshold, atomIndexes, atomScores);
+
+  for(uint ind = 0; ind < atomIndexes.size(); ind ++) {
+    Atom atom = instance.getAtom(atomIndexes[ind]);
+    cout << dataset.getColLabel(atom.first) << " " << atom.second << endl;
+  }
 
 }
 

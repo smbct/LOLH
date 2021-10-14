@@ -354,4 +354,4 @@ def discretization(filename, filename_discrete):
 
     df_discrete.to_csv(filename_discrete)
 
-discretization('../../dataset/Imagine/normalized_matrix.csv', '../../dataset/Imagine/discrete_matrix.csv')
+# discretization('../../dataset/Imagine/normalized_matrix.csv', '../../dataset/Imagine/discrete_matrix.csv')

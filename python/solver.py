@@ -576,12 +576,12 @@ class Solver:
         # compute the list of distances to the diagonal
         atom_distance = [-self.instance.n_negatives()*self.instance.atom_score[ind_atom][0] + self.instance.n_positives()*self.instance.atom_score[ind_atom][1] for ind_atom in range(self.instance.n_atoms())]
 
-        max_score = self.instance.n_negatives()
-        min_score = -self.instance.n_negatives()
+        # max_score = self.instance.n_negatives()
+        # min_score = -self.instance.n_negatives()
 
-        atom_distance = [ (value-min_score)/(max_score-min_score) for value in atom_distance]
+        # atom_distance = [ (value-min_score)/(max_score-min_score) for value in atom_distance]
 
-        sorted_atoms = [ind for ind in range(self.instance.n_atoms())]
+        sorted_atoms = list(range(self.instance.n_atoms()))
         sorted_atoms.sort(key=lambda ind:atom_distance[ind], reverse=True)
 
         scores = [atom_distance[index] for index in sorted_atoms]
