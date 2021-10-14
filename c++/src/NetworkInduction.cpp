@@ -29,7 +29,7 @@ void NetworkInduction::computeNetwork(DataFrame<uint>& dataset, double selection
   nVar = NVAR_DEBUG;
   #endif
 
-  cout << "hello network :)" << endl;
+  // cout << "hello network :)" << endl;
   cout << "nvar to do: " << nVar << endl;
 
   /* list of atoms to test */

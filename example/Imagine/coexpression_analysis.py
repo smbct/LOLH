@@ -141,6 +141,7 @@ def plot_cell_scores(df_discrete, df_coordinates, gene_clusters, cluster_selecti
 
     n_line = math.ceil(len(cluster_indexes)/n_col)
     fig, axs = plt.subplots(n_line, n_col)
+    fig.tight_layout()
 
     ind_plot = 0
     for ind_line in range(n_line):
@@ -152,6 +153,8 @@ def plot_cell_scores(df_discrete, df_coordinates, gene_clusters, cluster_selecti
                 plot_rule_error(df_discrete, df_coordinates, instance, body, ax)
                 ax.set_title('cluster ' + str(ind_cluster))
                 ind_plot += 1
+
+    title = None
 
     if title != None:
         fig.suptitle(title)
@@ -254,7 +257,7 @@ def decompose_cluster(df_coordinates, instance, gene_clusters, cluster_index, er
 
     # export the cells corresponding to cluster 6 in a csv file
     df_selection = pd.DataFrame([1 for _ in selected_cells] + [0 for _ in remaining_cells], index=selected_cells+remaining_cells, columns=['selection'])
-    filename = '../../coexpression/myeloid_c' + str(cluster_index) + '_selection'
+    filename = '../../dataset/Imagine/coexpression/myeloid_c' + str(cluster_index) + '_selection'
     if all_cells:
         filename += '_all_cells'
     filename += '.csv'
@@ -268,16 +271,16 @@ def decompose_cluster(df_coordinates, instance, gene_clusters, cluster_index, er
 def process_global_clusters():
 
     # read the discrete matrix
-    filename = '../../dataset/discrete_dataset.csv'
+    filename = '../../dataset/Imagine/discrete_matrix.csv'
     df_discrete = pd.read_csv(filename, index_col=0)
     print(df_discrete)
 
     # read the embedding coordinates
-    df_coordinates = pd.read_csv('../../dataset/UMAP_coordinates.csv', index_col=0)
+    df_coordinates = pd.read_csv('../../dataset/Imagine/umap_coordinates.csv', index_col=0)
 
 
     # read the gene clusters
-    gene_clusters = load_clusters('../../coexpression/gene_clusters.txt')
+    gene_clusters = load_clusters('../../dataset/Imagine/coexpression/gene_clusters.txt')
 
     print('n clusters: ', len(gene_clusters))
 
@@ -297,6 +300,7 @@ def process_global_clusters():
 
     # display gene cluster 4 cell score in a histogram
     ind_cluster = 4
+    ind_cluster = 5
     body = [instance.get_atom_index(atom) for atom in gene_clusters[ind_cluster] ]
     histo = histogram.Histogram(instance, body, histogram.Histogram_type.GLOBAL)
 
@@ -335,7 +339,7 @@ def process_global_clusters():
     #create_cell_score_dataframe('../../coexpression/gene_cluster_cell_scores.csv', df_discrete, gene_clusters)
 
     # create a sub dataset with the selected cells (presumably Myeloids)
-    create_sub_dataframe('../../dataset/sub_dataset_discrete.csv', df_discrete, selected_cells)
+    create_sub_dataframe('../../dataset/Imagine/sub_dataset_discrete.csv', df_discrete, selected_cells)
 
     plt.show()
 
@@ -348,20 +352,20 @@ def process_global_clusters():
 def process_sub_network_clusters():
 
     # read the sub discrete matrix (with only cells selected from the first network)
-    filename = '../../dataset/sub_dataset_discrete.csv'
+    filename = '../../dataset/Imagine/sub_dataset_discrete.csv'
     df_discrete_sub = pd.read_csv(filename, index_col=0)
     print(df_discrete_sub.head())
 
     # read the complete discrete matrix (to visualize the cluster matching error on all the cells)
-    filename = '../../dataset/discrete_dataset.csv'
+    filename = '../../dataset/Imagine/discrete_matrix.csv'
     df_discrete = pd.read_csv(filename, index_col=0)
 
     # read the embedding coordinates
-    df_coordinates = pd.read_csv('../../dataset/UMAP_coordinates.csv', index_col=0)
+    df_coordinates = pd.read_csv('../../dataset/Imagine/umap_coordinates.csv', index_col=0)
     df_coordinates_sub = df_coordinates.loc[df_discrete_sub.index] # select only cells in the sub dataset
 
     # read the gene clusters
-    gene_clusters = load_clusters('../../coexpression/sub_network_gene_clusters.txt')
+    gene_clusters = load_clusters('../../dataset/Imagine/coexpression/sub_network_gene_clusters.txt')
 
 
     ###########################################################################
@@ -378,7 +382,7 @@ def process_sub_network_clusters():
     # create a artificial instance to compute the matching error
     instance = Instance.create_random_instance(df_discrete_sub.copy(deep=False), 0.5)
 
-    selected_clusters = [1,4,5,8,9,10]
+    selected_clusters = [2,3,5,6]
 
     # output the clusters formatted in LaTex
     # for cluster_index in selected_clusters:
@@ -388,57 +392,57 @@ def process_sub_network_clusters():
     #     print('\n\n')
 
     # Display the cell score for each gene cluster on the UMAP
-    plot_cell_scores(df_discrete_sub, df_coordinates_sub_manual, gene_clusters, selected_clusters, 3, 'Clusters matching error on the myeloids')
+    plot_cell_scores(df_discrete_sub, df_coordinates_sub_manual, gene_clusters, selected_clusters, 2, 'Clusters matching error on the myeloids')
 
     # Same visualization on all the cells this time
-    plot_cell_scores(df_discrete, df_coordinates, gene_clusters, selected_clusters, 3, 'Clusters matching error on all the cells')
+    plot_cell_scores(df_discrete, df_coordinates, gene_clusters, selected_clusters, 2, 'Clusters matching error on all the cells')
 
-    # analysis of cluster 8 matching error
-    # cluster_index = 8
-    # error_threshold = 6
-    # decompose_cluster(df_coordinates_sub, instance, gene_clusters, cluster_index, error_threshold, False)
-
-    instance_global = Instance.create_random_instance(df_discrete.copy(deep=False), 0.5) # create a artificial instance on al cells
-
-    # analysis of cluster 8 matching error on all cells
+    # # analysis of cluster 8 matching error
+    # # cluster_index = 8
+    # # error_threshold = 6
+    # # decompose_cluster(df_coordinates_sub, instance, gene_clusters, cluster_index, error_threshold, False)
+    #
+    # instance_global = Instance.create_random_instance(df_discrete.copy(deep=False), 0.5) # create a artificial instance on al cells
+    #
+    # # analysis of cluster 8 matching error on all cells
+    # # cluster_index = 8
+    # # error_threshold = 8
+    # # decompose_cluster(df_coordinates, instance_global, gene_clusters, cluster_index, error_threshold, True)
+    #
+    #
+    # # analyss of cluster 8: selection of cells and decomposition into two groups: cells in the sub dataset and other cells
     # cluster_index = 8
     # error_threshold = 8
-    # decompose_cluster(df_coordinates, instance_global, gene_clusters, cluster_index, error_threshold, True)
-
-
-    # analyss of cluster 8: selection of cells and decomposition into two groups: cells in the sub dataset and other cells
-    cluster_index = 8
-    error_threshold = 8
-    body = [instance_global.get_atom_index(atom) for atom in gene_clusters[cluster_index] ]
-    histo = histogram.Histogram(instance_global, body, histogram.Histogram_type.GLOBAL)
-    selected_cells = [cell for error in range(error_threshold+1) for cell in histo.positive_histogram[error]]
-    other_cells = [barcode for barcode in df_discrete.index if not barcode in selected_cells]
-    positive_cells = [barcode for barcode in selected_cells if barcode in df_discrete_sub.index]
-    negative_cells = [barcode for barcode in selected_cells if not barcode in positive_cells]
-    fig,ax = plt.subplots()
-    ax.scatter(df_coordinates.loc[other_cells]['UMAP_1'].values, df_coordinates.loc[other_cells]['UMAP_2'].values, c='k', s=3)
-    ax.scatter(df_coordinates.loc[positive_cells]['UMAP_1'].values, df_coordinates.loc[positive_cells]['UMAP_2'].values, c='r', s=3)
-    ax.scatter(df_coordinates.loc[negative_cells]['UMAP_1'].values, df_coordinates.loc[negative_cells]['UMAP_2'].values, c='b', s=3)
-    ax.set_title('Selected cells from cluster 8: myeloids (red) vs other cells (blue)')
-    ax.set_xlabel('UMAP_1')
-    ax.set_ylabel('UMAP_2')
-    df_selection = pd.DataFrame([1 for _ in positive_cells] + [0 for _ in negative_cells], index=positive_cells+negative_cells, columns=['selection'])
-    filename = '../../coexpression/myeloid_c8_selection_myeloid_vs_others.csv'
-    df_selection.to_csv(filename)
-
-    # analysis of cluster 10 matching error
-    cluster_index = 10
-    error_threshold = 38
-    decompose_cluster(df_coordinates_sub, instance, gene_clusters, cluster_index, error_threshold, False)
-
-    # print the gene clusters
-    print_gene_clusters(gene_clusters)
-
-    # creation of a DataFrame with the gene clusters
-    create_dataframe_clusters('../../coexpression/sub_network_gene_clusters.csv', gene_clusters)
-
-    # creation of a dataframe with the cell scores (between 0 and 1)
-    create_cell_score_dataframe('../../coexpression/sub_network_gene_cluster_cell_scores.csv', df_discrete, gene_clusters)
+    # body = [instance_global.get_atom_index(atom) for atom in gene_clusters[cluster_index] ]
+    # histo = histogram.Histogram(instance_global, body, histogram.Histogram_type.GLOBAL)
+    # selected_cells = [cell for error in range(error_threshold+1) for cell in histo.positive_histogram[error]]
+    # other_cells = [barcode for barcode in df_discrete.index if not barcode in selected_cells]
+    # positive_cells = [barcode for barcode in selected_cells if barcode in df_discrete_sub.index]
+    # negative_cells = [barcode for barcode in selected_cells if not barcode in positive_cells]
+    # fig,ax = plt.subplots()
+    # ax.scatter(df_coordinates.loc[other_cells]['UMAP_1'].values, df_coordinates.loc[other_cells]['UMAP_2'].values, c='k', s=3)
+    # ax.scatter(df_coordinates.loc[positive_cells]['UMAP_1'].values, df_coordinates.loc[positive_cells]['UMAP_2'].values, c='r', s=3)
+    # ax.scatter(df_coordinates.loc[negative_cells]['UMAP_1'].values, df_coordinates.loc[negative_cells]['UMAP_2'].values, c='b', s=3)
+    # ax.set_title('Selected cells from cluster 8: myeloids (red) vs other cells (blue)')
+    # ax.set_xlabel('UMAP_1')
+    # ax.set_ylabel('UMAP_2')
+    # df_selection = pd.DataFrame([1 for _ in positive_cells] + [0 for _ in negative_cells], index=positive_cells+negative_cells, columns=['selection'])
+    # filename = '../../dataset/Imagine/coexpression/myeloid_c8_selection_myeloid_vs_others.csv'
+    # df_selection.to_csv(filename)
+    #
+    # # analysis of cluster 10 matching error
+    # cluster_index = 10
+    # error_threshold = 38
+    # decompose_cluster(df_coordinates_sub, instance, gene_clusters, cluster_index, error_threshold, False)
+    #
+    # # print the gene clusters
+    # print_gene_clusters(gene_clusters)
+    #
+    # # creation of a DataFrame with the gene clusters
+    # create_dataframe_clusters('../../dataset/Imagine/coexpression/sub_network_gene_clusters.csv', gene_clusters)
+    #
+    # # creation of a dataframe with the cell scores (between 0 and 1)
+    # create_cell_score_dataframe('../../dataset/Imagine/coexpression/sub_network_gene_cluster_cell_scores.csv', df_discrete, gene_clusters)
 
     plt.show()
 
