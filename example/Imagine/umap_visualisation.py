@@ -83,8 +83,6 @@ def plot_cell_types():
         celltypes_index += 1
     # fig.tight_layout(h_pad=1)
 
-
-
     legend_elements = [ Patch(facecolor=cell_color[cell_types[type_index]], label=cell_types_corrected[type_index]) for type_index in range(len(cell_types))]
     ax.legend(handles=legend_elements, bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0., labelspacing=0.1)
     fig.tight_layout(h_pad=1)
@@ -161,7 +159,9 @@ def plot_cell_macrotypes():
 
     return
 
+#-------------------------------------------------------------------------------
+def umap_visualisation():
 
-# plot_cell_types()
+    plot_cell_types()
 
-plot_cell_macrotypes()
+    plot_cell_macrotypes()

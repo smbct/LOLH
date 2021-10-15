@@ -11,7 +11,7 @@ from matplotlib.patches import Patch
 def UMAP_visualisation():
 
     # read the normalized matrix (logcpm)
-    filename = '../../dataset/normalized_dataset.csv'
+    filename = '../../dataset/Imagine/normalized_dataset.csv'
     df = pd.read_csv(filename, index_col=0)
     df = df.T
 
@@ -135,5 +135,5 @@ def UMAP_visualisation():
     fig.tight_layout(h_pad=1)
 
     plt.show()
-    
+
 # UMAP_visualisation()

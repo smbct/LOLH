@@ -52,9 +52,9 @@ void NetworkInduction::computeNetwork(DataFrame<uint>& dataset, double selection
   // #endif
 
   /* nb atoms done */
-  #if DEBUG_LOG == 1
+  // #if DEBUG_LOG == 1
   uint nAtomsDone = 0;
-  #endif
+  // #endif
 
   int cpt = 0;
 
@@ -181,10 +181,12 @@ void NetworkInduction::computeNetwork(DataFrame<uint>& dataset, double selection
     cout << debugStr << endl << endl;
     #endif
 
-    #if DEBUG_LOG == 1
+    // #if DEBUG_LOG == 1
     nAtomsDone ++;
-    cout << "n atoms done yet: " << nAtomsDone << endl;
-    #endif
+    if(nAtomsDone % 500 == 0) {
+      cout << "n atoms done yet: " << nAtomsDone << " over " << target.size() << endl;
+    }
+    // #endif
 
     // cout << dataset.getColLabel(elt.first) << " - " << elt.first << " - " << elt.second << " : fin" << endl;
 
@@ -206,7 +208,7 @@ void NetworkInduction::computeNetwork(DataFrame<uint>& dataset, double selection
   cout << "computation time: " << chrono::duration_cast<chrono::milliseconds>(stopTime-startTime).count() << endl;
   // #endif
 
-  cout << "cpt= " << cpt << endl;
+  // cout << "cpt= " << cpt << endl;
 
 }
 
