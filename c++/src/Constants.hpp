@@ -10,7 +10,7 @@
 #define CONSTANTS_HPP
 
 /* set to 1 to output debugging information */
-#define DEBUG_LOG 1                               
+#define DEBUG_LOG 0
 
 /* set to 1 to compute only few genes */
 #define DEBUG_REDUCTION 0
