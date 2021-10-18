@@ -17,3 +17,12 @@ nPositives = 1000
 nNegatives = 1000
 
 generator.generate_dataset(nVariables, nPositives, nNegatives, filename)
+
+
+########################################################
+# dimensionality reduction to visualize the data
+print('**********************************************************')
+print('    Evaluation of the dataset with different algorithms   ')
+print('**********************************************************')
+
+evaluation.evaluate(filename)
