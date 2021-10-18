@@ -6,7 +6,7 @@ LOLH is an Inductive Logic Programming framework based on Learning From Interpre
 
 ## Dependencies
 
-The following python packages are required to execute the code: scipy, numpy, pandas, matplotlib. pylfit is also required to perform a comparison between PRIDE and LOLH algorithms. The c++ code relies on openmp. The R script 'DE_testing.R' for differential expression (DE) analysis relies on the R package Seurat.
+The following python packages are required to execute the code: scipy, numpy, pandas, networkx, python-louvain, umap-learn, matplotlib. pylfit is also required to perform a comparison between PRIDE and LOLH algorithms. The c++ code relies on openmp. The R script 'DE_testing.R' for differential expression (DE) analysis relies on the R package Seurat.
 
 ## Usage
 
