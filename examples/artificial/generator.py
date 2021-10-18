@@ -14,6 +14,8 @@ from scipy.stats import t # student distribution
 # matplotlib
 import matplotlib.pyplot as plt
 
+
+
 #-------------------------------------------------------------------------------
 def print_ascii_histograms(selected_atoms, atoms, positives, negatives):
 
@@ -77,6 +79,9 @@ def print_ascii_histograms(selected_atoms, atoms, positives, negatives):
 
     return
 
+
+
+
 #-------------------------------------------------------------------------------
 def compute_atom_scores(nVar, sample_score, sample_uniform, nPos, nNeg):
 
@@ -103,6 +108,10 @@ def compute_atom_scores(nVar, sample_score, sample_uniform, nPos, nNeg):
         atom_scores.append(p_star)
 
     return atoms, atom_scores
+
+
+
+
 
 #-------------------------------------------------------------------------------
 def generate_positives_negatives(atom_scores, nVar, nPos, nNeg):
@@ -132,6 +141,10 @@ def generate_positives_negatives(atom_scores, nVar, nPos, nNeg):
                 negatives[neg_indexes[ind_neg]][ind_atom] = 0
 
     return positives, negatives
+
+
+
+
 
 #-------------------------------------------------------------------------------
 def generate_dataset(nVariables, nPositives, nNegatives, filename):
