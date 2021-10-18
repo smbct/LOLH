@@ -127,7 +127,8 @@ def plot_rule_error(df_discrete, df_coordinates, instance, body, ax):
     ax.set_aspect((ax.get_xlim()[1]-ax.get_xlim()[0])/(ax.get_ylim()[1]-ax.get_ylim()[0]))
 
     cbar = ax.get_figure().colorbar(cm.ScalarMappable(norm=cnorm, cmap=plasma), ax=ax)
-    cbar.set_label('Matching error')
+    # cbar.set_label('Matching error')
+    cbar.set_label('Erreur de couv.')
 
     return
 
@@ -312,9 +313,11 @@ def process_global_clusters():
     fig,ax = plt.subplots()
     values = [ error for error in range(len(histo.positive_histogram)) for _ in histo.positive_histogram[error] ]
     ax.hist(values, 50, density=True, edgecolor='black')
-    ax.set_ylabel('cell proportion')
-    ax.set_xlabel('matching error')
-    ax.set_title('Cell matching error for gene cluster ' + str(ind_cluster))
+    # ax.set_ylabel('cell proportion')
+    # ax.set_xlabel('matching error')
+    # ax.set_title('Cell matching error for gene cluster ' + str(ind_cluster))
+    ax.set_ylabel('proportion de cellules')
+    ax.set_xlabel('erreur de couverture')
 
 
     # select the cells that have the lower score

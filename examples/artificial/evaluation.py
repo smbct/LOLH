@@ -550,19 +550,21 @@ def k_fold_cross_validation(df, instance, k):
         RANDOM_perf[0].append(float(pos_match)/len(test_pos))
         RANDOM_perf[1].append(float(neg_match)/len(test_neg))
 
-    print('performances of LOLH:')
+    print('Performances of LOLH:\n')
     print(LOLH_perf)
     print('\n')
-    print('performances of PRIDE:')
+
+    print('Performances of PRIDE:\n')
     print(PRIDE_perf)
     print('\n')
-    print('performances of a RANDOM rule:')
+
+    print('Performances of a RANDOM rule:\n')
     print(RANDOM_perf)
 
     return
 
 #-------------------------------------------------------------------------------
-def evaluate_rules(filename):
+def evaluate(filename):
 
     random_seed = 42
     random.seed(random_seed)
@@ -571,8 +573,23 @@ def evaluate_rules(filename):
     # load the matrix
     df = pd.read_csv(filename, index_col=0)
 
+
+
+
+    ########################################################
     # dimensionality reduction to visualize the data
+    print('*------------------------------------------------------------*')
+    print('    Dimensionality reduction on the data for visualization    ')
+    print('*------------------------------------------------------------*')
+
     dimensionality_reduction(df)
+
+    plt.show()
+
+    print('\n\n\n\n')
+
+
+
 
     # classification from positive vs negative
     pos_samples = ['s_'+str(ind) for ind in range(0, int(df.shape[0]/2.))]
@@ -595,6 +612,8 @@ def evaluate_rules(filename):
 
     solver = Solver(inst)
 
+
+
     ########################################################
     # computation of LOLH rule
 
@@ -613,8 +632,11 @@ def evaluate_rules(filename):
     # plot the body
     # print([inst.get_atom(ind) for ind in LOLH_rule])
 
+
+
+
     ########################################################
-    # compute pride rules
+    # computation of PRIDE rules
     PRIDE_rules = compute_pride_bodies(inst)
     PRIDE_atoms = list(np.unique([atom_index for pride_rule in PRIDE_rules for atom_index in pride_rule]))
     print('n rules pride: ', len(PRIDE_rules))
@@ -626,38 +648,97 @@ def evaluate_rules(filename):
         PRIDE_rule_scores.append(compute_rule_score(PRIDE_rule, inst))
 
 
+
+
+
     ########################################################
     # plot LOLH and PRIDE rule scores
+
+    print('*-------------------------------------------------------*')
+    print('    Comparison of the rule scores from LOLH and PRIDE    ')
+    print('*-------------------------------------------------------*')
+
     plot_LOLH_PRIDE_scores(inst, LOLH_rule, LOLH_rule_score, PRIDE_rules, PRIDE_rule_scores)
+
+    plt.show()
+
+    print('\n\n\n\n')
+
 
 
     ########################################################
     # plot all the atoms
+    print('*-------------------------------------------------*')
+    print('    Comparison of the atoms from LOLH and PRIDE    ')
+    print('*-------------------------------------------------*')
+
     plot_atoms(inst, LOLH_rule, PRIDE_atoms)
+
+    plt.show()
+
+    print('\n\n\n\n')
+
+
 
 
     ########################################################
     # plot the histograms of the LOLH rule and of some PRIDE rules
+    print('*------------------------------------------------------*')
+    print('    Comparison of the histograms from LOLH and PRIDE    ')
+    print('*------------------------------------------------------*')
+
     plot_LOLH_PRIDE_histograms(inst, LOLH_rule, PRIDE_rules, PRIDE_rule_scores)
+
+    plt.show()
+
+    print('\n\n\n\n')
+
 
 
     ################################################################
     # computation of the multi-objective rules
+    print('*-------------------------------------------------------*')
+    print('    Comparison of two different multi-objective rules    ')
+    print('*-------------------------------------------------------*')
+
     multiobjective_comparison(inst, solver)
+
+    plt.show()
+
+    print('\n\n\n\n')
+
+
 
 
     ################################################################
     # display several rules with histograms
+    print('*-----------------------------------------------------*')
+    print('    Comparison of the histograms from several rules    ')
+    print('*-----------------------------------------------------*')
+
     rule_histograms_comparisons(inst, solver)
+
+    plt.show()
+
+    print('\n\n\n\n')
+
+
 
 
     ################################################################
     # K-fold validation on PRIDE and LOLH
+    print('*----------------------------------------------------------------*')
+    print('    Comparison of several models with 10-fold cross validation    ')
+    print('*----------------------------------------------------------------*')
+
+
     k = 10
     k_fold_cross_validation(df, inst, k)
 
     plt.show()
 
+    print('\n\n\n\n')
+
     return
 
-evaluate_rules('../../dataset/artificial/artificial_matrix.csv')
+# evaluate('../../dataset/artificial/artificial_matrix.csv')
