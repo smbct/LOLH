@@ -293,11 +293,11 @@ def process_global_clusters():
     instance = Instance.create_random_instance(df_discrete.copy(deep=False), 0.5)
 
     # output the clusters formatted in LaTex
-    # for cluster_index in range(len(gene_clusters)):
-    #     cluster = gene_clusters[cluster_index]
-    #     print('gene cluster ', cluster_index, '(', len(cluster), ' atoms)')
-    #     print_cluster_latex(instance, gene_clusters[cluster_index])
-    #     print('\n\n')
+    for cluster_index in range(len(gene_clusters)):
+        cluster = gene_clusters[cluster_index]
+        print('gene cluster ', cluster_index, '(', len(cluster), ' atoms)')
+        print_cluster_latex(instance, gene_clusters[cluster_index])
+        print('\n\n')
 
     # Display the cell score for each gene cluster on the UMAP
     plot_cell_scores(df_discrete, df_coordinates, gene_clusters, None, 2, None)
