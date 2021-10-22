@@ -67,10 +67,10 @@ print('*************************************************************************
 # output_file = '../../dataset/Imagine/coexpression/gene_clusters.txt'
 # network_clustering.network_clustering(input_file, n_cell_min, score_min, louvain_param, output_file)
 #
-print('\n\n')
-print('6) Analysis of the network')
-
-coexpression_analysis.process_global_clusters()
+# print('\n\n')
+# print('6) Analysis of the network')
+#
+# coexpression_analysis.process_global_clusters()
 
 # print('\n\n\n')
 # print('7) Computation of a sub network')
@@ -95,7 +95,7 @@ coexpression_analysis.process_global_clusters()
 # output_file = '../../dataset/Imagine/coexpression/sub_network_gene_clusters.txt'
 # network_clustering.network_clustering(input_file, n_cell_min, score_min, louvain_param, output_file)
 
-# print('\n\n\n')
-# print('9) Analysis of the sub network')
-#
-# coexpression_analysis.process_sub_network_clusters()
+print('\n\n\n')
+print('9) Analysis of the sub network')
+
+coexpression_analysis.process_sub_network_clusters()
