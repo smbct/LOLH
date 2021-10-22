@@ -46,9 +46,16 @@ def load_clusters(filename):
 #------------------------------------------------------------------------------
 def print_cluster_latex(instance, cluster):
 
+    print(cluster)
+
+    cluster_values = { (0,3):0, (0,2):1, (0,1):2, (1,3):3, (1,2):4, (2/3):5, (1,1):6, (2,2):7, (3,3):9}
+
+    ordered_cluster = cluster.copy()
+    ordered_cluster.sort(key = lambda atom: cluster_values[(atom[1], instance.n_values[atom[0]]-1)])
+
     # output the clusters formatted in LaTex
     res = ''
-    for elt in cluster:
+    for elt in ordered_cluster:
         atom_index = instance.get_atom_index(elt)
         val = elt[1]
         nval = instance.n_values[elt[0]]
@@ -373,7 +380,7 @@ def process_sub_network_clusters():
 
     # read the gene clusters
     gene_clusters = load_clusters('../../dataset/Imagine/coexpression/sub_network_gene_clusters.txt')
-
+    print('number of atom clusters: ', len(gene_clusters))
 
     ###########################################################################
     # Manual sub selection of the Myeloids
@@ -384,19 +391,14 @@ def process_sub_network_clusters():
             if pos[1] >= -16 and pos[1] <= -11:
                 selected_indexes.append(index)
     df_coordinates_sub_manual = df_coordinates_sub.loc[selected_indexes]
+    print(df_coordinates_sub.shape[0]-df_coordinates_sub_manual.shape[0], ' cells are discarded')
     ###########################################################################
+
 
     # create a artificial instance to compute the matching error
     instance = Instance.create_random_instance(df_discrete_sub.copy(deep=False), 0.5)
 
     selected_clusters = [2,3,5,6]
-
-    # output the clusters formatted in LaTex
-    # for cluster_index in selected_clusters:
-    #     cluster = gene_clusters[cluster_index]
-    #     print('gene cluster ', cluster_index, '(', len(cluster), ' atoms)')
-    #     print_cluster_latex(instance, gene_clusters[cluster_index])
-    #     print('\n\n')
 
     # Display the cell score for each gene cluster on the UMAP
     plot_cell_scores(df_discrete_sub, df_coordinates_sub_manual, gene_clusters, selected_clusters, 2, 'Clusters matching error on the myeloids')
@@ -410,6 +412,14 @@ def process_sub_network_clusters():
     # decompose_cluster(df_coordinates_sub, instance, gene_clusters, cluster_index, error_threshold, False)
 
     instance_global = Instance.create_random_instance(df_discrete.copy(deep=False), 0.5) # create a artificial instance on al cells
+
+    # output the clusters formatted in LaTex
+    # for cluster_index in selected_clusters:
+    #     cluster = gene_clusters[cluster_index]
+    #     print('gene cluster ', cluster_index, '(', len(cluster), ' atoms)')
+    #     # print_cluster_latex(instance, gene_clusters[cluster_index])
+    #     print_cluster_latex(instance_global, gene_clusters[cluster_index])
+    #     print('\n\n')
 
     # analysis of cluster 5 matching error on all cells
     # cluster_index = 5
