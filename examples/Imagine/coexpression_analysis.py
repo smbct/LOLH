@@ -48,7 +48,7 @@ def print_cluster_latex(instance, cluster):
 
     print(cluster)
 
-    cluster_values = { (0,3):0, (0,2):1, (0,1):2, (1,3):3, (1,2):4, (2/3):5, (1,1):6, (2,2):7, (3,3):9}
+    cluster_values = { (0,3):0, (0,2):1, (0,1):2, (1,3):3, (1,2):4, (2,3):5, (1,1):6, (2,2):7, (3,3):9}
 
     ordered_cluster = cluster.copy()
     ordered_cluster.sort(key = lambda atom: cluster_values[(atom[1], instance.n_values[atom[0]]-1)])

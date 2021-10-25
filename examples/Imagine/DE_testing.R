@@ -58,15 +58,16 @@ positive_cells <- df_selection[df_selection$selection == 1,'X']
 negative_cells <- df_selection[df_selection$selection == 0,'X']
 markers <- de_testing(positive_cells, negative_cells) # perform DE testing
 print(head(markers)) # print the first rows
-write.csv(markers, 'c6_markers.csv', row.names = TRUE)
+write.table(markers, 'c6_markers.csv', sep=",", row.names = TRUE, quote=FALSE)
 
 cat('\n\n')
 
 ###################################################################################
 # (DE) analysis of the cells selected from cluster 5: cells from the myeloids vs other cells
 cat('(DE) analysis from cluster 5 cell selection: myeloids vs other cells:\n')
-df_selection <- read.csv("../coexpression/myeloid_c5_selection_myeloid_vs_others.csv")
+df_selection <- read.csv("../../dataset/Imagine/coexpression/myeloid_c5_selection_myeloid_vs_others.csv")
 positive_cells <- df_selection[df_selection$selection == 1,'X']
 negative_cells <- df_selection[df_selection$selection == 0,'X']
 markers <- de_testing(positive_cells, negative_cells) # perform DE testing
 print(head(markers)) # print the first rows
+write.table(markers, 'c5_DE.csv', sep=",", row.names = TRUE, quote=FALSE)
