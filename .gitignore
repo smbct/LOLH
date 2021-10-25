@@ -33,6 +33,7 @@
 
 # Datsets
 dataset/*
+examples/Imagine/*.csv
 
 # python
 __pycache__

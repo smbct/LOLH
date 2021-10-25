@@ -73,7 +73,7 @@ Parameters parametersExtraction(int argc, char* argv[]) {
       cout << "-v: display additional information on the computation" << endl;
       cout << "-r: compute the regulation network, if not, compute the coexpression network instead" << endl;
       cout << "-cq: only compute the instance quality, otherwise compute the network" << endl;
-      cout << "-im: input matrix file (csv singl cell matrix)" << endl;
+      cout << "-im: input matrix file (csv single cell matrix)" << endl;
       cout << "-o: output file (gene network)" << endl;
       cout << "-t: selection threshold: 0. <= threshold <= 1." << endl;
       cout << "-it: input transitions file, for dynamic network only" << endl;
