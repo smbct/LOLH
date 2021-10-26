@@ -37,3 +37,4 @@ examples/Imagine/*.csv
 
 # python
 __pycache__
+.Rproj.user

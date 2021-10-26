@@ -336,7 +336,7 @@ void DataFrame<T>::createNeighbourhoodGraph(DataFrame<uint>& dataframe, DataFram
 template <class T>
 void DataFrame<T>::createNeighbourhoodGraph(DataFrame<uint>& dataframe, DataFrame<string>& transitions, DataFrame<string>& ordering, uint delay, NGraph& graph) {
 
-  cout << "hello ordering :)" << endl;
+  // cout << "hello ordering :)" << endl;
 
   cout << "n theoretical transitions: " << dataframe.nRows()*(dataframe.nRows()-1) << endl;
 

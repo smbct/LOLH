@@ -452,6 +452,8 @@ void ClassificationQuality::computeAtomCoexprQuality(DataFrame<uint>& dataset, s
   auto startTime = chrono::steady_clock::now();
   #endif
 
+  uint nvar = 0;
+
   #if USE_OPENMP == 1
   #pragma omp parallel num_threads(N_THREADS)
   {
@@ -542,6 +544,11 @@ void ClassificationQuality::computeAtomCoexprQuality(DataFrame<uint>& dataset, s
     #if DEBUG_LOG == 1
     cout << debugStr << endl << endl;
     #endif
+
+    nvar ++;
+    if(nvar % 500 == 0) {
+      cout << nvar << " atoms done over " << target.size() << endl;
+    }
 
     // cout << dataset.getColLabel(elt.first) << " - " << elt.first << " - " << elt.second << " : fin" << endl;
 
@@ -809,9 +816,9 @@ void ClassificationQuality::computeAtomRegulQuality(DataFrame<uint>& dataset, NG
   /* computation time */
   auto start = chrono::steady_clock::now();
 
-  #if DEBUG_LOG == 1
+  // #if DEBUG_LOG == 1
   unsigned int k = 0;
-  #endif
+  // #endif
 
   #if USE_OPENMP == 1
   #pragma omp parallel num_threads(N_THREADS)
@@ -936,10 +943,15 @@ void ClassificationQuality::computeAtomRegulQuality(DataFrame<uint>& dataset, NG
     cout << debug_str << endl;
     #endif
 
-    #if DEBUG_LOG == 1
+    // #if DEBUG_LOG == 1
+    // k += 1;
+    // cout << endl << endl << k << " atoms over " << target.size() << endl << endl << endl;
+    // #endif
+
     k += 1;
-    cout << endl << endl << k << " atoms over " << target.size() << endl << endl << endl;
-    #endif
+    if(k % 500 == 0) {
+      cout << "n atoms done yet: " << k << " over " << target.size() << endl;
+    }
 
   }
 
