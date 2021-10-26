@@ -146,7 +146,11 @@ void computeRegulation(Parameters param) {
   DataFrame<uint>::createNeighbourhoodGraph(dataset, transitions, param.transition_delay, successors);
 
   if(param.compute_network) {
-    NetworkInduction::computeRegulationNetwork(dataset, successors, param.transition_rate, param.predecessor_neq, param.threshold, param.output_file);
+    if(param.threshold >= 0) {
+      NetworkInduction::computeRegulationNetwork(dataset, successors, param.transition_rate, param.predecessor_neq, param.threshold, param.output_file);
+    } else {
+      /* error */
+    }
   } else {
     ClassificationQuality::computeAtomRegulQuality(dataset, successors, param.transition_rate, param.predecessor_neq, param.output_file);
   }
@@ -162,7 +166,11 @@ void computeCoexpression(Parameters param) {
   dataset.computeUniqueVal();
 
   if(param.compute_network) {
-    NetworkInduction::computeNetwork(dataset, param.threshold, param.output_file);
+    if(param.threshold >= 0) {
+      NetworkInduction::computeNetwork(dataset, param.threshold, param.output_file);
+    } else {
+      /* error */
+    }
   } else {
     ClassificationQuality::computeAtomCoexprQuality(dataset, param.output_file);
   }
@@ -185,7 +193,7 @@ int main(int argc, char* argv[]) {
   if(param.debug) {
     debug();
   } else {
-    if(param.input_matrix.size() > 0 && param.output_file.size() > 0 && param.threshold >= 0) {
+    if(param.input_matrix.size() > 0 && param.output_file.size() > 0) {
       if(param.coexpression) {
         computeCoexpression(param);
       } else {
