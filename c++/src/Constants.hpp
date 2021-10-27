@@ -13,9 +13,9 @@
 #define DEBUG_LOG 0
 
 /* set to 1 to compute only few genes */
-#define DEBUG_REDUCTION 0
+#define DEBUG_REDUCTION 1
 /* number of variables to compute if DEBUG_REDUCTION == 1 */
-#define NVAR_DEBUG 20
+#define NVAR_DEBUG 5
 
 /* true if only a sub sample of the data is used */
 #define SAMPLING false

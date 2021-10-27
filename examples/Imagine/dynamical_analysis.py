@@ -37,8 +37,6 @@ def read_quality_file(filename):
         tokens = line.split(' ')
         data.append((tokens[0], int(tokens[1]), float(tokens[2]), int(tokens[3]), int(tokens[4])))
 
-    print(data[:10])
-
     return data
 
 #-------------------------------------------------------------------------------
@@ -68,14 +66,30 @@ def plot_quality(data, ax):
 
 print('hello dynamics')
 
-filename = 'coexpression_quality.txt'
-# filename = 'transitions_quality.txt'
+# filename = 'coexpression_quality.txt'
+# # filename = 'transitions_quality.txt'
+# data = read_quality_file(filename)
+# fig, ax = plt.subplots()
+# plot_quality(data, ax)
+# plt.show()
 
-data = read_quality_file(filename)
+filename = '../../dataset/Imagine/transitions.csv'
+df = pd.read_csv(filename, index_col=0)
+print(df.head())
 
+successors = {}
 
-fig, ax = plt.subplots()
-plot_quality(data, ax)
+for index in df.index:
+    left = df['T-1'][index]
+    right = df['T'][index]
 
+    if left in successors:
+        successors[left].append(right)
+    else:
+        successors[left] = [right]
 
-plt.show()
+print(successors)
+
+nsuc = [len(successors[elt]) for elt in successors]
+nsuc.sort()
+print(nsuc)
