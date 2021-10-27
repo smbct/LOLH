@@ -177,30 +177,87 @@ void computeCoexpression(Parameters param) {
 
 }
 
+/*----------------------------------------------------------------------------*/
+void LIGER_expe_dynamics() {
+
+  string matrix_file = "../dataset/Imagine/discrete_matrix.csv";
+  string transitions_file = "../dataset/Imagine/transitions.csv";
+  string output_file = "";
+
+  // vector<float> tau_values = {-1, 0.2, 0.4, 0.6, 0.8};
+  // vector<uint> rho_values = {0,1,2};
+  // vector<uint> delta_values = {1,2};
+
+  vector<float> tau_values = {0.4};
+  vector<uint> rho_values = {0};
+  vector<uint> delta_values = {2};
+
+  Parameters param;
+  param.compute_network = false;
+  param.coexpression = false;
+  param.input_matrix = matrix_file;
+  param.input_transitions = transitions_file;
+
+
+  /* load the discretized single cell matrix */
+  DataFrame<uint> dataset;
+  dataset.loadFromCSV(param.input_matrix);
+  dataset.computeUniqueVal();
+
+  /* load the transitions file */
+  DataFrame<string> transitions;
+  transitions.loadFromCSV(param.input_transitions);
+
+
+  for(float tau: tau_values) {
+    for(uint rho: rho_values) {
+      for(uint delta: delta_values) {
+
+        param.transition_rate = tau;
+        param.predecessor_neq = rho;
+        param.transition_delay = delta;
+        param.output_file = "dynamics_quality_t_" + to_string(tau) + "_r_" + to_string(rho) + "_d_" + to_string(delta) + ".txt";
+
+        // cout << tau << ", " << rho << ", " << delta << endl;
+        // cout << param.output_file << endl;
+
+        /* create the transition */
+        NGraph successors;
+        DataFrame<uint>::createNeighbourhoodGraph(dataset, transitions, param.transition_delay, successors);
+
+        ClassificationQuality::computeAtomRegulQuality(dataset, successors, param.transition_rate, param.predecessor_neq, param.output_file);
+
+      }
+    }
+  }
+
+}
 
 
 /*----------------------------------------------------------------------------*/
 int main(int argc, char* argv[]) {
 
-  cout << "*******************************************************************" << endl;
-  cout << "        Computation of a gene network with LOLH algorithm          " << endl;
-  cout << "*******************************************************************" << endl;
+  // cout << "*******************************************************************" << endl;
+  // cout << "        Computation of a gene network with LOLH algorithm          " << endl;
+  // cout << "*******************************************************************" << endl;
+  //
+  // Utils::getInstance().initRand(42);
+  //
+  // Parameters param = parametersExtraction(argc, argv);
+  //
+  // if(param.debug) {
+  //   debug();
+  // } else {
+  //   if(param.input_matrix.size() > 0 && param.output_file.size() > 0) {
+  //     if(param.coexpression) {
+  //       computeCoexpression(param);
+  //     } else {
+  //       computeRegulation(param);
+  //     }
+  //   }
+  // }
 
-  Utils::getInstance().initRand(42);
-
-  Parameters param = parametersExtraction(argc, argv);
-
-  if(param.debug) {
-    debug();
-  } else {
-    if(param.input_matrix.size() > 0 && param.output_file.size() > 0) {
-      if(param.coexpression) {
-        computeCoexpression(param);
-      } else {
-        computeRegulation(param);
-      }
-    }
-  }
+  LIGER_expe_dynamics();
 
   return 0;
 }

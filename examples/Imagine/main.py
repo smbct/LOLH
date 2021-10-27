@@ -62,7 +62,7 @@ print('5) Clustering the network')
 print('\n')
 
 input_file = '../../dataset/Imagine/coexpression/coexpression_network.txt'
-n_cell_min = 200Rscript extract_transitions.R
+n_cell_min = 200
 score_min = 0.35
 louvain_param = 0.7
 output_file = '../../dataset/Imagine/coexpression/gene_clusters.txt'
