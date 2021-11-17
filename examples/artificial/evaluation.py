@@ -95,22 +95,24 @@ def dimensionality_reduction(df):
 
     col = ['forestgreen' for _ in range(int(df.shape[0]/2))] + ['darkred' for _ in range(int(df.shape[0]/2))]
 
-    axs[0].scatter(embedding[:, 0], embedding[:, 1], s=2, c=col)
-    axs[0].set_aspect('equal', 'datalim')
+    axs[0].scatter(embedding[:, 0], embedding[:, 1], s=0.5, c=col)
+    # axs[0].set_aspect('equal', 'datalim')
     axs[0].set_title('projection UMAP')
     axs[0].set_xlabel('UMAP 1')
     axs[0].set_ylabel('UMAP 2')
     axs[0].legend(handles=[mpatches.Patch(color='forestgreen', label='exemples positifs'), mpatches.Patch(color='darkred', label='exemples négatifs')], loc='lower right')
+    axs[0].set_aspect((axs[0].get_xlim()[1]-axs[0].get_xlim()[0])/(axs[0].get_ylim()[1]-axs[0].get_ylim()[0]))
 
     # PCA projection
     X = df.values.copy()
     X=StandardScaler().fit_transform(X)
     X_pca = PCA(n_components=2).fit_transform(X)
-    axs[1].scatter(X_pca[:,0], X_pca[:,1], c=col, s=2)
+    axs[1].scatter(X_pca[:,0], X_pca[:,1], c=col, s=0.5)
     axs[1].set_title('projection PCA')
     axs[1].set_xlabel('PCA 1')
     axs[1].set_ylabel('PCA 2')
     axs[1].legend(handles=[mpatches.Patch(color='forestgreen', label='exemples positifs'), mpatches.Patch(color='darkred', label='exemples négatifs')])
+    axs[1].set_aspect((axs[1].get_xlim()[1]-axs[1].get_xlim()[0])/(axs[1].get_ylim()[1]-axs[1].get_ylim()[0]))
 
     return
 

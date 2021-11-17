@@ -38,17 +38,15 @@ def print_lines(df):
 # df = pd.read_csv(filename, index_col=0)
 # df = df.loc[df.index[:30]]
 
-filename = 'c6_markers.csv'
-
-# filename = 'c5_DE.csv'
-
-df = pd.read_csv(filename, index_col=0)
-df_sub = df.loc[df.index[:20]]
-print_lines(df_sub)
-print('\n\n')
-df_sub = df.loc[df.index[-20:]]
-print_lines(df_sub)
-
+# filename = 'c6_markers.csv'
+# # filename = 'c5_DE.csv'
+#
+# df = pd.read_csv(filename, index_col=0)
+# df_sub = df.loc[df.index[:20]]
+# print_lines(df_sub)
+# print('\n\n')
+# df_sub = df.loc[df.index[-20:]]
+# print_lines(df_sub)
 
 
 # print(df.head(), '\n\n')

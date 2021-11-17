@@ -85,6 +85,7 @@ def plot_cell_types():
 
     legend_elements = [ Patch(facecolor=cell_color[cell_types[type_index]], label=cell_types_corrected[type_index]) for type_index in range(len(cell_types))]
     ax.legend(handles=legend_elements, bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0., labelspacing=0.1)
+
     fig.tight_layout(h_pad=1)
 
 
@@ -153,9 +154,91 @@ def plot_cell_macrotypes():
     legend_elements = [ Patch(facecolor=colors_dic[celltype], label=celltype if celltype != 'nan' else 'NA') for celltype in colors_dic]
     ax.legend(handles=legend_elements, bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0.)
 
+    ax.set_aspect((ax.get_xlim()[1] - ax.get_xlim()[0])/(ax.get_ylim()[1] - ax.get_ylim()[0]))
+
     fig.tight_layout(h_pad=1)
 
     plt.show()
+
+    return
+
+#-------------------------------------------------------------------------------
+def plot_LEF1():
+
+    # load the UMAP coordinates
+    file_name = '../../dataset/Imagine/umap_coordinates.csv'
+    umap_coordinates = pd.read_csv(file_name, index_col = 0)
+
+    # import the cell types
+    file_name = '../../dataset/Imagine/cell_types.csv'
+    df_cell_types = pd.read_csv(file_name, index_col=0)
+    df_cell_types.rename(columns={'cellType_final': 'Label'}, inplace=True)
+    print(df_cell_types)
+
+    # load the normalized matrix
+    file_name = '../../dataset/Imagine/normalized_matrix.csv'
+    df = pd.read_csv(file_name, index_col = 0)
+    df = df.T
+
+
+    # plot the LEF1 expression
+    cell_indexes_sorted = list(umap_coordinates.index.values)
+    LEF1_values = df.loc[cell_indexes_sorted]['LEF1'].values
+    LEF1_values_dic = {cell_indexes_sorted[ind]:LEF1_values[ind] for ind in range(len(cell_indexes_sorted))}
+
+
+    cell_indexes_sorted.sort(key=lambda ind:LEF1_values_dic[ind])
+
+    LEF1_values = df.loc[cell_indexes_sorted]['LEF1'].values
+
+    fig, ax = plt.subplots()
+    umap_coordinates_bis = umap_coordinates.loc[cell_indexes_sorted]
+    ax.scatter(umap_coordinates_bis['UMAP_1'], umap_coordinates_bis['UMAP_2'], marker='o', s=4, c=LEF1_values)
+    ax.set_xlabel('UMAP 1')
+    ax.set_ylabel('UMAP 2')
+    ax.set_title('LEF 1')
+    ax.set_aspect((ax.get_xlim()[1]-ax.get_xlim()[0])/(ax.get_ylim()[1]-ax.get_ylim()[0]))
+
+
+    y_dic = {ind:np.random.normal(0,1) for ind in df.index}
+
+    fig, axs = plt.subplots(1,3)
+
+    ax = axs[0]
+    ax.scatter(np.random.normal(0,1, len(LEF1_values)), LEF1_values, marker='x')
+
+    CD8_naives = [ind for ind in df_cell_types.index if df_cell_types['Label'][ind] == 'CD8-naive']
+    CD4_naives = [ind for ind in df_cell_types.index if df_cell_types['Label'][ind] == 'CD4-naive']
+
+    CD4_CD8_immatures = CD8_naives + CD4_naives
+
+    CD8 = [ind for ind in df_cell_types.index if df_cell_types['Label'][ind] == 'CD8']
+    CD4 = [ind for ind in df_cell_types.index if df_cell_types['Label'][ind] == 'CD4']
+
+    CD4_CD8 = CD4+CD8
+
+    others = [ind for ind in df.index if not ind in CD4_CD8 and not ind in CD4_CD8_immatures]
+
+    ax = axs[1]
+    # violin plot for each gene
+    # parts = ax.violinplot(df.loc[CD4_CD8_immatures]['LEF1'].values, showmeans=False, showmedians=True)
+    parts = ax.violinplot([df.loc[CD4_CD8]['LEF1'].values, df.loc[CD4_CD8_immatures]['LEF1'].values, df.loc[others]['LEF1']], showmeans=False, showmedians=True)
+
+    for pc in parts['bodies']:
+        pc.set_facecolor('green')
+        pc.set_edgecolor('black')
+        pc.set_alpha(0.5)
+
+    ax.scatter([y_dic[index] for index in CD4_CD8_immatures], [df['LEF1'][index] for index in CD4_CD8_immatures], marker='x', c='red')
+    ax.set_ylim(axs[0].get_ylim())
+    ax.set_xlim(axs[0].get_xlim())
+
+    ax = axs[2]
+    ax.scatter([y_dic[index] for index in CD4_CD8], [df['LEF1'][index] for index in CD4_CD8], marker='x', c='green')
+    ax.set_xlim(axs[0].get_xlim())
+    ax.set_ylim(axs[0].get_ylim())
+
+    plot_cell_types()
 
     return
 
@@ -165,3 +248,7 @@ def umap_visualisation():
     plot_cell_types()
 
     plot_cell_macrotypes()
+
+# umap_visualisation()
+
+plot_LEF1()
