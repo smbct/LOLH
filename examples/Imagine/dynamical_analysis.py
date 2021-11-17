@@ -97,6 +97,69 @@ def create_regulatory_graph():
     return graph
 
 
+#-------------------------------------------------------------------------------
+def plot_cluster_umap(df_discrete, df_coordinates, instance, body, ax):
+
+    histo = histogram.Histogram(instance, body, histogram.Histogram_type.GLOBAL)
+
+    plasma = cm.get_cmap('plasma_r', 256)
+
+    cnorm = mcolors.Normalize(vmin=0, vmax=len(histo.positive_histogram))
+
+    cell_score = {barcode : error for error in range(len(histo.positive_histogram)) for barcode in histo.positive_histogram[error]}
+
+    # sort all the cells according to the score
+    barcodes = [index for index in df_coordinates.index]
+    barcodes.sort(key = lambda elt: cell_score[elt], reverse=True)
+    df_coordinates_sorted = df_coordinates.loc[barcodes]
+
+    col = [cell_score[barcode] for barcode in df_coordinates_sorted.index]
+    ax.scatter(df_coordinates_sorted['UMAP_1'].values, df_coordinates_sorted['UMAP_2'].values, c=col, cmap=plasma, norm=cnorm, s=3)
+
+    # remove UMAP coordinates
+    ax.xaxis.set_major_locator(ticker.NullLocator())
+    ax.yaxis.set_major_locator(ticker.NullLocator())
+
+    ax.set_xlabel('UMAP 1')
+    ax.set_ylabel('UMAP 2')
+
+    # squared plots
+    # ax.set_aspect((ax.get_ylim()[1]-ax.get_ylim()[0])/(ax.get_xlim()[1]-ax.get_xlim()[0]))
+    ax.set_aspect((ax.get_xlim()[1]-ax.get_xlim()[0])/(ax.get_ylim()[1]-ax.get_ylim()[0]))
+
+    cbar = ax.get_figure().colorbar(cm.ScalarMappable(norm=cnorm, cmap=plasma), ax=ax)
+    # cbar.set_label('Matching error')
+    cbar.set_label('Erreur de couv.')
+
+    return
+
+
+#-------------------------------------------------------------------------------
+def plot_gene_umap(df_normalized, df_coordinates, gene, ax):
+
+    plasma = cm.get_cmap('plasma', 256)
+
+    cell_values_dic = {barcode : df_normalized[gene][barcode] for barcode in df_normalized.index}
+    cell_values = list(cell_values_dic.values())
+
+    barcodes = [index for index in df_coordinates.index]
+    barcodes.sort(key = lambda elt: cell_values_dic[elt], reverse=False)
+    df_coordinates_sorted = df_coordinates.loc[barcodes]
+
+    cnorm = mcolors.Normalize(vmin=min(cell_values), vmax=max(cell_values))
+
+    col = [cell_values_dic[barcode] for barcode in df_coordinates_sorted.index]
+
+    ax.scatter(df_coordinates_sorted['UMAP_1'].values, df_coordinates_sorted['UMAP_2'].values, c=col, cmap=plasma, norm=cnorm, s=3)
+
+    ax.set_xlabel('UMAP 1')
+    ax.set_ylabel('UMAP 2')
+
+    cbar = ax.get_figure().colorbar(cm.ScalarMappable(norm=cnorm, cmap=plasma), ax=ax)
+    cbar.set_label('gene value')
+
+    return
+
 # create_regulatory_graph()
 
 # load the graph from an existing file
@@ -107,8 +170,8 @@ graph.load_from_file(filename)
 
 # load the discrete dataset
 filename = '../../dataset/Imagine/discrete_matrix.csv'
-df = pd.read_csv(filename, index_col = 0)
-print(df.head())
+df_discrete = pd.read_csv(filename, index_col = 0)
+print(df_discrete.head())
 
 # load the cell types
 filename = '../../dataset/Imagine/cell_types.csv'
@@ -121,6 +184,10 @@ df_umap = pd.read_csv(filename, index_col = 0)
 print(df_umap.head())
 
 # load the normalized dataset
+filename = '../../dataset/Imagine/normalized_matrix.csv'
+df_normalized = pd.read_csv(filename, index_col = 0)
+df_normalized = df_normalized.T
+print(df_normalized.head())
 
 # display
 print('display the (directed) graph')
@@ -134,14 +201,43 @@ col_option = 'clustering_colors'
 fig, ax = plt.subplots()
 graph.plot(ax, col_option, arrows, cluster_size_limit)
 
+
 # save the graph
 # filename = '../../dataset/Imagine/regulatory_network_processed.txt'
 # graph.save(filename)
 
-# clusters = {}
-# for cluster in graph.clusters:
-#     if len(graph.clusters[cluster]) >= 20:
-#         clusters[cluster] = graph.clusters[cluster]
+clusters = {}
+for cluster in graph.clusters:
+    if len(graph.clusters[cluster]) >= 20:
+        clusters[cluster] = graph.clusters[cluster]
 # print(clusters)
+
+print('plot the clusters')
+# create a fake instance
+instance = Instance.create_random_instance(df_discrete.copy(deep=False), 0.5)
+# cluster_index = list(clusters.keys())[0]
+
+selected_clusters = [6,7,8,9,11,20]
+
+ncol = 2
+nrows = int(len(selected_clusters)/float(ncol))
+fix, axs = plt.subplots(nrows, ncol)
+axs = axs.flat
+ind_plot = 0
+for cluster_index in selected_clusters:
+    ax = axs[ind_plot]
+    body =  [ instance.get_atom_index(graph.atoms[index]) for index in clusters[ cluster_index ] ]
+    # fig, ax = plt.subplots()
+    ax.set_title('cluster ' + str(cluster_index))
+    plot_cluster_umap(df_discrete, df_umap, instance, body, ax)
+    ind_plot += 1
+
+
+# plot a single gene
+gene = 'PPBP'
+fig, ax = plt.subplots()
+ax.set_title('gene ' + gene)
+plot_gene_umap(df_normalized, df_umap, gene, ax)
+
 
 plt.show()
