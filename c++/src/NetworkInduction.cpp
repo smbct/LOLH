@@ -233,7 +233,6 @@ void NetworkInduction::computeRegulationNetwork(DataFrame<uint>& dataset, NGraph
     }
   }
 
-
   /* output for the file */
   vector<string> output(target.size());
 

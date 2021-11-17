@@ -2,8 +2,15 @@
 
 import numpy as np
 
+from matplotlib import pyplot as plt
+from matplotlib.colors import colorConverter
+import matplotlib.colors as mcolors
+import matplotlib.patches as mpatches
+
 import networkx as nx
 import community as community_louvain
+from fa2 import ForceAtlas2
+
 
 # Data structure to store all the information from the network raw file
 #------------------------------------------------------------------------------
@@ -109,7 +116,7 @@ class Graph:
         #self.color_palette = [elt for elt in mcolors.TABLEAU_COLORS] + ['goldenrod', 'indigo', 'steelblue']
 
         self.name = name
-        
+
         np.random.seed(42)
 
         return
@@ -211,6 +218,244 @@ class Graph:
 
         return
 
+
+    #------------------------------------------------------------------------------
+    def create_from_gdata_regul(self, data, exclude_mt_rp, filter_edges = False):
+
+        # filter_edges: additional filter: exclude isolated edges
+
+        candidates = [True for _ in range(data.n_atoms())]
+        stop = False
+
+        pending = []
+        pending2 = [ind for ind in range(data.n_atoms())]
+
+        while len(pending2) > 0: # look for a fix point
+
+            pending = pending2
+            pending2 = []
+
+            for ind in pending:
+
+                excluded = False
+
+                if candidates[ind]:
+
+                    gene_name = data.atoms[ind][0]
+
+                    # exclude ribosomal and mitochondrial genes
+                    if exclude_mt_rp and ('RPL' in gene_name or 'RPS' in gene_name or 'MT' in gene_name):
+                        excluded = True
+
+                    # exclude genes if they are connected to only one other gene
+                    if filter_edges and not excluded:
+                        nb_candidates_edges = 0
+                        last_candidates_edge = -1
+                        for edge in data.edges[ind]:
+                            ind2 = edge[0]
+                            if candidates[ind2]:
+                                nb_candidates_edges += 1
+                                last_candidates_edge = ind2
+                            if nb_candidates_edges > 1:
+                                break
+
+                        if nb_candidates_edges == 1:
+
+                            nb_candidates_edges_bis = 0
+                            last_candidates_edge_bis = -1
+
+                            for edge in data.edges[last_candidates_edge]:
+                                ind3 = edge[0]
+                                if candidates[ind3]:
+                                    nb_candidates_edges_bis += 1
+                                    last_candidates_edge_bis = ind3
+                                if nb_candidates_edges_bis > 1:
+                                    break
+
+                            if nb_candidates_edges_bis == 0:
+                                excluded = True
+
+                            elif nb_candidates_edges_bis == 1 and last_candidates_edge_bis == ind:
+                                excluded = True
+
+                    # exclude vertices if the neighbours are not connected to enough vertices
+                    if not excluded:
+                        nb_successors = 0
+                        for edge in data.edges[ind]:
+                            ind2 = edge[0]
+                            if candidates[ind2]:
+                                nb_successors += 1
+                        if nb_successors < 2:
+                            # look for the number of predecessor
+                            nb_predecessors = 0
+                            for ind2 in data.predecessors[ind]:
+                                if candidates[ind2]:
+                                    nb_predecessors += 1
+
+                            if nb_predecessors < 2 or nb_predecessors >= 30:
+                                excluded = True
+
+
+                    if excluded:
+                        candidates[ind] = False
+                        pending2 += [edge[0] for edge in data.edges[ind] if candidates[edge[0]]]
+                        pending2 += [ind2 for ind2 in data.predecessors[ind] if candidates[ind2]]
+
+            pending2 = np.unique(pending2)
+
+        selected_atoms = [ind for ind in range(data.n_atoms()) if candidates[ind]]
+        print('N selected atoms: ', len(selected_atoms))
+
+        #print('selected atoms: ', selected_atoms)
+
+        self.atoms = [data.atoms[ind] for ind in selected_atoms]
+        self.atom_indexes = {self.atoms[ind]:ind for ind in range(len(self.atoms))}
+
+        # dictionaries to access between original data and reduced graph indexes for vertices
+        gdata_to_graph_index = [-1 for _ in range(data.n_atoms())]
+        graph_to_gdata_index = [-1 for _ in range(len(self.atoms))]
+        graph_ind = 0
+        for gdata_ind in selected_atoms:
+            gdata_to_graph_index[gdata_ind] = graph_ind
+            graph_to_gdata_index[graph_ind] = gdata_ind
+            graph_ind += 1
+
+        # compute the min and max weight to normalize weights
+        min_weight = -1
+        max_weight = -1
+        for gdata_ind in selected_atoms:
+            for edge in data.edges[gdata_ind]:
+                if min_weight < 0 or edge[1] < min_weight:
+                    min_weight = edge[1]
+                if max_weight < 0 or edge[1] > max_weight:
+                    max_weight = edge[1]
+
+        # create a list of weighted edges of the graph: undirected -> mean weight
+        self.edges = []
+        self.weights = []
+
+        nb = 0
+
+        for gdata_ind in selected_atoms:
+            if nb % 100 == 0:
+                print(nb, ' over ', len(selected_atoms))
+            nb += 1
+            for edge in data.edges[gdata_ind]:
+                gdata_ind2 = edge[0]
+
+                # make sure both vertices have been selected
+                if gdata_ind2 in selected_atoms:
+
+                    weight = edge[1]
+                    weight = (weight-min_weight)/(max_weight-min_weight)
+
+                    # make sure the other vertex is in the graph as well
+                    graph_ind2 = gdata_to_graph_index[gdata_ind2]
+                    if graph_ind2 >= len(selected_atoms):
+                        print('error: ', graph_ind2)
+
+                    # self.edges.append((gdata_to_graph_index[gdata_ind], graph_ind2))
+                    # inverted edges
+                    self.edges.append((graph_ind2, gdata_to_graph_index[gdata_ind]))
+                    self.weights.append(weight)
+
+        return
+
+
+
+    #------------------------------------------------------------------------------
+    def plot(self, ax, col_option, arrows = False, cluster_size_limit = 20):
+
+        # arrows: draw arrows instead of edges
+
+        # plot the graph from force atlas 2 2d positions
+
+        ax.get_xaxis().set_visible(False)
+        ax.get_yaxis().set_visible(False)
+
+        # plot the clusters
+        for ind_cluster in self.clusters:
+
+            if len(self.clusters[ind_cluster]) >= cluster_size_limit:
+
+                pos_cluster = None
+                for ind_atom in self.clusters[ind_cluster]:
+                    if pos_cluster == None:
+                        pos_cluster = self.positions[ind_atom]
+                    else:
+                        pos_cluster = (pos_cluster[0]+self.positions[ind_atom][0], pos_cluster[1]+self.positions[ind_atom][1])
+
+                pos_cluster = (pos_cluster[0]/len(self.clusters[ind_cluster]), pos_cluster[1]/len(self.clusters[ind_cluster]))
+
+                text = ax.text(pos_cluster[0], pos_cluster[1], 'c' + str(ind_cluster), ha="center", va="center", color='tan', fontsize=12, fontweight='bold', zorder=2, bbox=dict(facecolor='blue', alpha=0.5, boxstyle='round')).set_clip_on(True)
+
+        if col_option == 'clustering_colors':
+            # create a legend for the clusters
+            legend_elements = [ mpatches.Patch(facecolor=self.color_palette[ind_cluster%len(self.color_palette)], label='c'+str(ind_cluster)) for ind_cluster in self.clusters if len(self.clusters[ind_cluster]) >= cluster_size_limit]
+            ax.legend(handles=legend_elements, loc='upper left')
+
+        elif col_option == '01_colors': # legend for 0/1 value
+            # create for expressed/unexpressed
+            legend_elements = [ mpatches.Patch(facecolor='red', label='unexpressed'), mpatches.Patch(facecolor='forestgreen', label='expressed')]
+            ax.legend(handles=legend_elements, loc='upper left')
+
+        # plot the vertices
+        for ind in range(len(self.atoms)):
+
+            atom = self.atoms[ind]
+
+            if col_option == 'clustering_colors':
+                if len(self.clusters[self.atom_cluster[ind]]) >= cluster_size_limit:
+                    atom_color = self.color_palette[self.atom_cluster[ind]%len(self.color_palette)]
+                else:
+                    atom_color = 'grey'
+
+            elif col_option == '01_colors': # color based on discrete value
+
+                if atom[1] == 0:
+                    atom_color = 'red'
+                else:
+                    atom_color = 'forestgreen'
+
+            else:
+                atom_color = 'black'
+
+            # elif col_option == 'TF_01_colors': # color based on transcription factor
+            # if atom[0] in TF_names:
+            #    if atom[1] == 0:
+            #        atom_color = 'red'
+            #    else:
+            #        atom_color = 'green'
+
+
+            text = ax.text(self.positions[ind][0], self.positions[ind][1], atom[0]+'_'+str(atom[1]), ha="center", va="center", color=atom_color, fontsize=8, fontweight='bold', zorder=1).set_clip_on(True)
+
+
+
+        if arrows:
+            X = [self.positions[edge[0]][0] for edge in self.edges]
+            Y = [self.positions[edge[0]][1] for edge in self.edges]
+            U = [self.positions[edge[1]][0] - self.positions[edge[0]][0] for edge in self.edges]
+            V = [self.positions[edge[1]][1] - self.positions[edge[0]][1] for edge in self.edges]
+            ax.quiver(X, Y, U, V, scale_units='xy', angles='xy', scale=1, color=[colorConverter.to_rgba('black', alpha=self.weights[ind]) for ind in range(len(self.edges))])
+
+        else:
+
+            drawLines = []
+            for edge in self.edges:
+                p1 = self.positions[edge[0]]
+                p2 = self.positions[edge[1]]
+                drawLines.append([p1[0], p2[0]])
+                drawLines.append([p1[1], p2[1]])
+            ax.plot(*drawLines, zorder=0)
+
+            for ind in range(len(self.edges)):
+                #ax.lines[ind].set_linewidth( (nx_edges[ind][2]/9000.)*1. )
+                ax.lines[ind].set_color(colorConverter.to_rgba('black', alpha=self.weights[ind]))
+                ax.lines[ind].set_linewidth( self.weights[ind] )
+
+        return
+
     #------------------------------------------------------------------------------
     def _create_nx_graph(self):
 
@@ -224,6 +469,39 @@ class Graph:
 
         return
 
+
+    #------------------------------------------------------------------------------
+    def compute_positions(self):
+
+        # compute 2d positions with Force Atlas 2 algorithm
+
+        if self.nx_graph == None:
+            self._create_nx_graph()
+
+        forceatlas2 = ForceAtlas2(
+                                # Behavior alternatives
+                                outboundAttractionDistribution=True,  # Dissuade hubs
+                                linLogMode=False,  # NOT IMPLEMENTED
+                                adjustSizes=False,  # Prevent overlap (NOT IMPLEMENTED)
+                                edgeWeightInfluence=1.,
+
+                                # Performance
+                                jitterTolerance=1.0,  # Tolerance
+                                barnesHutOptimize=True,
+                                barnesHutTheta=1.2,
+                                multiThreaded=False,  # NOT IMPLEMENTED
+
+                                # Tuning
+                                scalingRatio=2.0,
+                                strongGravityMode=False,
+                                gravity=1.0,
+
+                                # Log
+                                verbose=True)
+
+        self.positions = forceatlas2.forceatlas2_networkx_layout(self.nx_graph, pos=None, iterations=2000)
+
+        return
 
     #------------------------------------------------------------------------------
     def compute_clusters(self, res):

@@ -237,27 +237,27 @@ void LIGER_expe_dynamics() {
 /*----------------------------------------------------------------------------*/
 int main(int argc, char* argv[]) {
 
-  // cout << "*******************************************************************" << endl;
-  // cout << "        Computation of a gene network with LOLH algorithm          " << endl;
-  // cout << "*******************************************************************" << endl;
-  //
-  // Utils::getInstance().initRand(42);
-  //
-  // Parameters param = parametersExtraction(argc, argv);
-  //
-  // if(param.debug) {
-  //   debug();
-  // } else {
-  //   if(param.input_matrix.size() > 0 && param.output_file.size() > 0) {
-  //     if(param.coexpression) {
-  //       computeCoexpression(param);
-  //     } else {
-  //       computeRegulation(param);
-  //     }
-  //   }
-  // }
+  cout << "*******************************************************************" << endl;
+  cout << "        Computation of a gene network with LOLH algorithm          " << endl;
+  cout << "*******************************************************************" << endl;
 
-  LIGER_expe_dynamics();
+  Utils::getInstance().initRand(42);
+
+  Parameters param = parametersExtraction(argc, argv);
+
+  if(param.debug) {
+    debug();
+  } else {
+    if(param.input_matrix.size() > 0 && param.output_file.size() > 0) {
+      if(param.coexpression) {
+        computeCoexpression(param);
+      } else {
+        computeRegulation(param);
+      }
+    }
+  }
+
+  // LIGER_expe_dynamics();
 
   return 0;
 }

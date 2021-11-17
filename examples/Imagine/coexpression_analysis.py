@@ -300,11 +300,11 @@ def process_global_clusters():
     instance = Instance.create_random_instance(df_discrete.copy(deep=False), 0.5)
 
     # output the clusters formatted in LaTex
-    for cluster_index in range(len(gene_clusters)):
-        cluster = gene_clusters[cluster_index]
-        print('gene cluster ', cluster_index, '(', len(cluster), ' atoms)')
-        print_cluster_latex(instance, gene_clusters[cluster_index])
-        print('\n\n')
+    # for cluster_index in range(len(gene_clusters)):
+    #     cluster = gene_clusters[cluster_index]
+    #     print('gene cluster ', cluster_index, '(', len(cluster), ' atoms)')
+    #     print_cluster_latex(instance, gene_clusters[cluster_index])
+    #     print('\n\n')
 
     # Display the cell score for each gene cluster on the UMAP
     plot_cell_scores(df_discrete, df_coordinates, gene_clusters, None, 2, None)
@@ -340,6 +340,7 @@ def process_global_clusters():
     ax.set_title('Selected cells from gene cluster ' + str(ind_cluster))
     colors = ['red' if barcode in selected_cells else 'black' for barcode in df_coordinates.index]
     ax.scatter(df_coordinates['UMAP_1'].values, df_coordinates['UMAP_2'].values, c=colors, s=3)
+    ax.set_aspect((ax.get_xlim()[1]-ax.get_xlim()[0])/(ax.get_ylim()[1]-ax.get_ylim()[0]))
     ax.set_title('Cells selected through the matching error from cluster ' + str(ind_cluster))
 
     # print the gene clusters
@@ -507,6 +508,6 @@ def process_sub_network_clusters():
 
     return
 
-# process_global_clusters()
+process_global_clusters()
 
 # process_sub_network_clusters()

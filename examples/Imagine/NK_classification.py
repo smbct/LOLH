@@ -50,7 +50,15 @@ def NK_classification():
     LOLH_rule, _ = solver.select_best_atoms_threshold(score_thresold)
 
 
-
+    ################################################################################
+    # display the atom scores only
+    # fig, ax = plt.subplots()
+    # ax.scatter([instance.atom_score[atom_index][0] for atom_index in range(instance.n_atoms())], [instance.atom_score[atom_index][1] for atom_index in range(instance.n_atoms())], marker='x', alpha=0.7)
+    # ax.plot([0, instance.n_positives()], [0, instance.n_negatives()], color='black', label='score=0.0', zorder=3)
+    # ax.set_xlabel('erreur positive')
+    # ax.set_ylabel('erreur négative')
+    # ax.legend(loc='lower right')
+    # ax.set_aspect((ax.get_xlim()[1]-ax.get_xlim()[0])/(ax.get_ylim()[1]-ax.get_ylim()[0]))
 
 
 
@@ -172,3 +180,5 @@ def NK_classification():
 
 
     plt.show()
+
+# NK_classification()
