@@ -169,7 +169,7 @@ def global_analysis():
     # create_regulatory_graph()
 
     # load the graph from an existing file
-    filename = '../../dataset/Imagine/regulatory_network_processed.txt'
+    filename = '../../dataset/Imagine/dynamics/regulatory_network_processed.txt'
     graph = Graph('regulatory network')
     graph.load_from_file(filename)
 
@@ -242,6 +242,53 @@ def global_analysis():
             clusters[cluster] = graph.clusters[cluster]
     # print(clusters)
 
+    ################################################################################
+    #### load the coexpression network on the T cells
+
+    # analysis of the sub co-expression network on the T cells for comparison
+    filename = '../../dataset/Imagine/coexpression/T_coexpression_network.txt'
+    n_cell_min = 10
+    score_min = 0.35
+    louvain_param = 0.7
+    data_coexpr_T = GData()
+    data_coexpr_T.load_from_file(filename, n_cell_min, score_min)
+    graph_coexpr_T = Graph('coexpression network (T cells)')
+    # build graph from raw data, exclude mitochondrial and ribosomal genes
+    exclude_mt_rp = True
+    filter_edges = True
+    graph_coexpr_T.create_from_gdata(data_coexpr_T, exclude_mt_rp, filter_edges)
+    graph_coexpr_T.compute_clusters(louvain_param)
+    graph_coexpr_T.compute_positions()
+    fig, ax = plt.subplots()
+    ax.set_title('T cells coexpression graph')
+    graph_coexpr_T.plot(ax, 'clustering_colors', False, 10)
+
+    # plots the clusters
+
+    clusters_coexpr_T = {}
+    for cluster in graph_coexpr_T.clusters:
+        if len(graph_coexpr_T.clusters[cluster]) >= 10:
+            clusters_coexpr_T[cluster] = graph_coexpr_T.clusters[cluster]
+
+    instance = Instance.create_random_instance(df_discrete.copy(deep=False), 0.5)
+
+    ncol = 2
+    nrows = 2
+    fig, axs = plt.subplots(nrows, ncol)
+    fig.suptitle('clusters graphe coexpr T cells')
+    axs = axs.flat
+    ind_plot = 0
+    for cluster_index in clusters_coexpr_T:
+        ax = axs[ind_plot]
+        body =  [ instance.get_atom_index(graph_coexpr_T.atoms[index]) for index in clusters_coexpr_T[ cluster_index ] ]
+        # fig, ax = plt.subplots()
+        ax.set_title('cluster ' + str(cluster_index))
+        plot_cluster_umap(df_discrete, df_umap, instance, body, ax)
+        ind_plot += 1
+
+
+    ########################################################################""
+
     print('plot the clusters')
     # create a fake instance
     instance = Instance.create_random_instance(df_discrete.copy(deep=False), 0.5)
@@ -305,7 +352,7 @@ def sub_analysis():
     # transitions_df_sub = transitions_df.loc[selected_transitions]
     # transitions_df_sub.to_csv('../../dataset/Imagine/transitions_T.csv')
 
-    filename = '../../dataset/Imagine/T_regulatory_network.txt'
+    filename = '../../dataset/Imagine/dynamics/T_regulatory_network.txt'
 
     n_cell_min = 20
     score_min = 0.35
@@ -321,11 +368,11 @@ def sub_analysis():
     graph.compute_positions()
 
     fig, ax = plt.subplots()
-    ax.set_title('T cels regulatory graph')
+    ax.set_title('T cells regulatory graph')
     graph.plot(ax, 'clustering_colors', True, 10)
 
     fig, ax = plt.subplots()
-    ax.set_title('T cels regulatory graph')
+    ax.set_title('T cells regulatory graph')
     graph.plot(ax, '01_colors', True, 10)
 
     # graph.save(output_file)
@@ -335,6 +382,6 @@ def sub_analysis():
     return
 
 
-# global_analysis()
+global_analysis()
 
-sub_analysis()
+# sub_analysis()

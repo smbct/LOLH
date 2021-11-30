@@ -508,6 +508,6 @@ def process_sub_network_clusters():
 
     return
 
-process_global_clusters()
+# process_global_clusters()
 
 # process_sub_network_clusters()
