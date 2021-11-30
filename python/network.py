@@ -373,7 +373,7 @@ class Graph:
         ax.get_xaxis().set_visible(False)
         ax.get_yaxis().set_visible(False)
 
-        # plot the clusters
+        # plot the clusters labels
         for ind_cluster in self.clusters:
 
             if len(self.clusters[ind_cluster]) >= cluster_size_limit:
@@ -398,6 +398,9 @@ class Graph:
             # create for expressed/unexpressed
             legend_elements = [ mpatches.Patch(facecolor='red', label='unexpressed'), mpatches.Patch(facecolor='forestgreen', label='expressed')]
             ax.legend(handles=legend_elements, loc='upper left')
+
+        vertices_positions = []
+        vertices_colors = []
 
         # plot the vertices
         for ind in range(len(self.atoms)):
@@ -430,14 +433,17 @@ class Graph:
 
             text = ax.text(self.positions[ind][0], self.positions[ind][1], atom[0]+'_'+str(atom[1]), ha="center", va="center", color=atom_color, fontsize=8, fontweight='bold', zorder=1).set_clip_on(True)
 
+            vertices_positions.append(self.positions[ind])
+            vertices_colors.append(atom_color)
 
+        # ax.scatter([elt[0] for elt in vertices_positions], [elt[1] for elt in vertices_positions], c=vertices_colors, marker='x', zorder=1)
 
         if arrows:
             X = [self.positions[edge[0]][0] for edge in self.edges]
             Y = [self.positions[edge[0]][1] for edge in self.edges]
             U = [self.positions[edge[1]][0] - self.positions[edge[0]][0] for edge in self.edges]
             V = [self.positions[edge[1]][1] - self.positions[edge[0]][1] for edge in self.edges]
-            ax.quiver(X, Y, U, V, scale_units='xy', angles='xy', scale=1, color=[colorConverter.to_rgba('black', alpha=self.weights[ind]) for ind in range(len(self.edges))])
+            ax.quiver(X, Y, U, V, scale_units='xy', angles='xy', scale=1, color=[colorConverter.to_rgba('black', alpha=self.weights[ind]) for ind in range(len(self.edges))], zorder=0)
 
         else:
 
@@ -453,6 +459,8 @@ class Graph:
                 #ax.lines[ind].set_linewidth( (nx_edges[ind][2]/9000.)*1. )
                 ax.lines[ind].set_color(colorConverter.to_rgba('black', alpha=self.weights[ind]))
                 ax.lines[ind].set_linewidth( self.weights[ind] )
+
+        ax.set_aspect('equal')
 
         return
 

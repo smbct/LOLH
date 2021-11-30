@@ -68,7 +68,7 @@ def NK_classification():
 
     other_atoms_indexes = [atom_index for atom_index in range(instance.n_atoms()) if not atom_index in LOLH_rule]
 
-    ax.scatter([instance.atom_score[atom_index][0] for atom_index in LOLH_rule], [instance.atom_score[atom_index][1] for atom_index in LOLH_rule], marker='o', color='red', s=4, label='atomes sélectionnés', zorder=2)
+    ax.scatter([instance.atom_score[atom_index][0] for atom_index in LOLH_rule], [instance.atom_score[atom_index][1] for atom_index in LOLH_rule], marker='x', color='red', label='atomes sélectionnés', zorder=2)
 
     ax.scatter([instance.atom_score[atom_index][0] for atom_index in other_atoms_indexes], [instance.atom_score[atom_index][1] for atom_index in other_atoms_indexes], marker='x', zorder=1, label='autres atomes', alpha=0.7)
 
@@ -181,4 +181,4 @@ def NK_classification():
 
     plt.show()
 
-# NK_classification()
+NK_classification()
