@@ -67,6 +67,11 @@ Parameters parametersExtraction(int argc, char* argv[]) {
         param.transition_delay = stoi(string(argv[index+1]));
         index ++;
       }
+    } else if(argument == "-me") {
+      if(index < argc-1) {
+        param.max_edges = stoi(string(argv[index+1]));
+        index ++;
+      }
     } else if(argument == "-h") {
       cout << "usage: " << endl;
       cout << "-d: execute the debug function" << endl;
@@ -80,6 +85,7 @@ Parameters parametersExtraction(int argc, char* argv[]) {
       cout << "-tr: transition rate between 0 and 1, or -1.: proportion of successors of a state required to verify the learned atom, to consider the state as positive, -1.: must be verified at least once" << endl;
       cout << "-pnq: 0 if the predecessor can be different or equal to the learned atom, 1 if it should be different, 2 if it should be equal" << endl;
       cout << "-td: transition delay (integer), > 1: length of the paths where the extremities are considered as a transition" << endl;
+      cout << "-me: maximum number of edges for transition learning, default value = 0, meaning there is no limitation" << endl;
     } else {
       cout << "argument " << argument << " not recognised" << endl;
     }
@@ -147,7 +153,7 @@ void computeRegulation(Parameters param) {
 
   if(param.compute_network) {
     if(param.threshold >= 0) {
-      NetworkInduction::computeRegulationNetwork(dataset, successors, param.transition_rate, param.predecessor_neq, param.threshold, param.output_file);
+      NetworkInduction::computeRegulationNetwork(dataset, successors, param.transition_rate, param.predecessor_neq, param.threshold, param.output_file, param.max_edges);
     } else {
       /* error */
     }

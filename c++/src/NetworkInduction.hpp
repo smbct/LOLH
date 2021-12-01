@@ -37,8 +37,9 @@ class NetworkInduction {
      * \param predNeq indicates if only transitions with a different value for the target are selected
      * \param selectionThreshold the min relative distance of selected genes
      * \param output_filename the name of the ouput file
+     * \param max_edges maximum number of edges for an atom. 0 is the defualt value, meaning no limitations
      */
-    static void computeRegulationNetwork(DataFrame<uint>& dataset, NGraph successors, double trRate, uint predNeq, double selectionThreshold, std::string output_filename);
+    static void computeRegulationNetwork(DataFrame<uint>& dataset, NGraph successors, double trRate, uint predNeq, double selectionThreshold, std::string output_filename, uint max_edges = 0);
 
     /*!
      * \brief compute a co-expression network for all genes

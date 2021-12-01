@@ -160,6 +160,50 @@ def plot_gene_umap(df_normalized, df_coordinates, gene, ax):
 
     return
 
+#------------------------------------------------------------------------------
+#                Print the gene clusters formatted in LaTex
+#------------------------------------------------------------------------------
+def print_cluster_latex(instance, cluster):
+
+    print(cluster)
+
+    cluster_values = { (0,3):0, (0,2):1, (0,1):2, (1,3):3, (1,2):4, (2,3):5, (1,1):6, (2,2):7, (3,3):9}
+
+    ordered_cluster = cluster.copy()
+    ordered_cluster.sort(key = lambda atom: cluster_values[(atom[1], instance.n_values[atom[0]]-1)])
+
+    # output the clusters formatted in LaTex
+    res = ''
+    for elt in ordered_cluster:
+        atom_index = instance.get_atom_index(elt)
+        val = elt[1]
+        nval = instance.n_values[elt[0]]
+        color_str = None
+        if nval == 2:
+            if val == 0:
+                color_str = 'BrickRed'
+            elif val == 1:
+                color_str = 'OliveGreen'
+        elif nval == 3:
+            if val == 0:
+                color_str = 'BrickRed'
+            elif val == 1:
+                color_str = 'Goldenrod'
+            elif val == 2:
+                color_str = 'OliveGreen'
+        elif nval == 4:
+            if val == 0:
+                color_str = 'BrickRed'
+            elif val == 1:
+                color_str = 'Orange'
+            elif val == 2:
+                color_str = 'SpringGreen'
+            elif val == 3:
+                color_str = 'OliveGreen'
+        res += '\\textcolor{' + color_str + '}{$\\boldsymbol{\\textit{' + elt[0] + '}' + '_{' + str(elt[1]) + '/' + str(nval-1) + '}}$}, '
+    print(res)
+
+    return
 
 
 #-------------------------------------------------------------------------------
@@ -173,6 +217,11 @@ def global_analysis():
     graph = Graph('regulatory network')
     graph.load_from_file(filename)
 
+    clusters = {}
+    for cluster in graph.clusters:
+        if len(graph.clusters[cluster]) >= 20:
+            clusters[cluster] = graph.clusters[cluster]
+    # print(clusters)
 
     # load the discrete dataset
     filename = '../../dataset/Imagine/discrete_matrix.csv'
@@ -183,6 +232,11 @@ def global_analysis():
     filename = '../../dataset/Imagine/cell_types.csv'
     df_celltypes = pd.read_csv(filename, index_col = 0)
     print(df_celltypes.head())
+
+    # load the cell macro types
+    filename = '../../dataset/Imagine/cell_types_macro.csv'
+    df_cell_macrotypes = pd.read_csv(filename, index_col = 0)
+    print(df_cell_macrotypes.head())
 
     # load the UMAP representation
     filename = '../../dataset/Imagine/umap_coordinates.csv'
@@ -195,130 +249,192 @@ def global_analysis():
     df_normalized = df_normalized.T
     print(df_normalized.head())
 
-    # display
-    print('display the (directed) graph')
-    col_option = '01_colors'
-    arrows = True
-    cluster_size_limit = 20
-    fig, ax = plt.subplots()
-    graph.plot(ax, col_option, arrows, cluster_size_limit)
+    # # display the regulatory graph
+    # print('display the (directed) graph')
+    # col_option = '01_colors'
+    # arrows = True
+    # cluster_size_limit = 20
+    # fig, ax = plt.subplots()
+    # graph.plot(ax, col_option, arrows, cluster_size_limit)
+    # ax.set_title('Dynamical graph')
+    #
+    # col_option = 'clustering_colors'
+    # fig, ax = plt.subplots()
+    # graph.plot(ax, col_option, arrows, cluster_size_limit)
+    # ax.set_title('Dynamical graph')
 
-    col_option = 'clustering_colors'
-    fig, ax = plt.subplots()
-    graph.plot(ax, col_option, arrows, cluster_size_limit)
 
 
-    ################################################################################
-    #### load and process the coexpression network
-    # input_file = '../../dataset/Imagine/coexpression/coexpression_network.txt'
-    # n_cell_min = 200
+    # ################################################################################
+    # #### load and process the coexpression network
+    # # input_file = '../../dataset/Imagine/coexpression/coexpression_network.txt'
+    # # n_cell_min = 200
+    # # score_min = 0.35
+    # # louvain_param = 0.7
+    # # output_file = '../../dataset/Imagine/coexpression/coexpression_graph.txt'
+    # # codata = GData()
+    # # codata.load_from_file(input_file, n_cell_min, score_min)
+    # # cograph = Graph('coexpression network')
+    # # # build graph from raw data, exclude mitochondrial and ribosomal genes
+    # # exclude_mt_rp = True
+    # # filter_edges = True
+    # # cograph.create_from_gdata(codata, exclude_mt_rp, filter_edges)
+    # # cograph.compute_clusters(louvain_param)
+    # # cograph.compute_positions()
+    # # cograph.save(output_file)
+    #
+    # cograph = Graph('coexpression network')
+    # cograph.load_from_file('../../dataset/Imagine/coexpression/coexpression_graph.txt')
+    # fig, ax = plt.subplots()
+    # ax.set_title('Coexpression graph')
+    # cograph.plot(ax, 'clustering_colors', False, 10)
+    #
+    # # save the dynamical graph
+    # # filename = '../../dataset/Imagine/regulatory_network_processed.txt'
+    # # graph.save(filename)
+
+
+
+
+
+    # ################################################################################
+    # #### load the coexpression network on the T cells
+    #
+    # # analysis of the sub co-expression network on the T cells for comparison
+    # filename = '../../dataset/Imagine/coexpression/T_coexpression_network.txt'
+    # n_cell_min = 10
     # score_min = 0.35
     # louvain_param = 0.7
-    # output_file = '../../dataset/Imagine/coexpression/coexpression_graph.txt'
-    # codata = GData()
-    # codata.load_from_file(input_file, n_cell_min, score_min)
-    # cograph = Graph('coexpression network')
+    # data_coexpr_T = GData()
+    # data_coexpr_T.load_from_file(filename, n_cell_min, score_min)
+    # graph_coexpr_T = Graph('coexpression network (T cells)')
     # # build graph from raw data, exclude mitochondrial and ribosomal genes
     # exclude_mt_rp = True
     # filter_edges = True
-    # cograph.create_from_gdata(codata, exclude_mt_rp, filter_edges)
-    # cograph.compute_clusters(louvain_param)
-    # cograph.compute_positions()
-    # cograph.save(output_file)
-
-    cograph = Graph('coexpression network')
-    cograph.load_from_file('../../dataset/Imagine/coexpression/coexpression_graph.txt')
-    fig, ax = plt.subplots()
-    ax.set_title('coexpression graph')
-    cograph.plot(ax, 'clustering_colors', False, 10)
-
-    # save the dynamical graph
-    # filename = '../../dataset/Imagine/regulatory_network_processed.txt'
-    # graph.save(filename)
-
-    clusters = {}
-    for cluster in graph.clusters:
-        if len(graph.clusters[cluster]) >= 20:
-            clusters[cluster] = graph.clusters[cluster]
-    # print(clusters)
-
-    ################################################################################
-    #### load the coexpression network on the T cells
-
-    # analysis of the sub co-expression network on the T cells for comparison
-    filename = '../../dataset/Imagine/coexpression/T_coexpression_network.txt'
-    n_cell_min = 10
-    score_min = 0.35
-    louvain_param = 0.7
-    data_coexpr_T = GData()
-    data_coexpr_T.load_from_file(filename, n_cell_min, score_min)
-    graph_coexpr_T = Graph('coexpression network (T cells)')
-    # build graph from raw data, exclude mitochondrial and ribosomal genes
-    exclude_mt_rp = True
-    filter_edges = True
-    graph_coexpr_T.create_from_gdata(data_coexpr_T, exclude_mt_rp, filter_edges)
-    graph_coexpr_T.compute_clusters(louvain_param)
-    graph_coexpr_T.compute_positions()
-    fig, ax = plt.subplots()
-    ax.set_title('T cells coexpression graph')
-    graph_coexpr_T.plot(ax, 'clustering_colors', False, 10)
-
-    # plots the clusters
-
-    clusters_coexpr_T = {}
-    for cluster in graph_coexpr_T.clusters:
-        if len(graph_coexpr_T.clusters[cluster]) >= 10:
-            clusters_coexpr_T[cluster] = graph_coexpr_T.clusters[cluster]
-
+    # graph_coexpr_T.create_from_gdata(data_coexpr_T, exclude_mt_rp, filter_edges)
+    # graph_coexpr_T.compute_clusters(louvain_param)
+    # graph_coexpr_T.compute_positions()
+    # fig, ax = plt.subplots()
+    # ax.set_title('T cells coexpression graph')
+    # graph_coexpr_T.plot(ax, 'clustering_colors', False, 10)
+    #
+    # # plots the clusters
+    #
+    # clusters_coexpr_T = {}
+    # for cluster in graph_coexpr_T.clusters:
+    #     if len(graph_coexpr_T.clusters[cluster]) >= 10:
+    #         clusters_coexpr_T[cluster] = graph_coexpr_T.clusters[cluster]
+    #
     instance = Instance.create_random_instance(df_discrete.copy(deep=False), 0.5)
-
-    ncol = 2
-    nrows = 2
-    fig, axs = plt.subplots(nrows, ncol)
-    fig.suptitle('clusters graphe coexpr T cells')
-    axs = axs.flat
-    ind_plot = 0
-    for cluster_index in clusters_coexpr_T:
-        ax = axs[ind_plot]
-        body =  [ instance.get_atom_index(graph_coexpr_T.atoms[index]) for index in clusters_coexpr_T[ cluster_index ] ]
-        # fig, ax = plt.subplots()
-        ax.set_title('cluster ' + str(cluster_index))
-        plot_cluster_umap(df_discrete, df_umap, instance, body, ax)
-        ind_plot += 1
-
-
-    ########################################################################""
-
-    print('plot the clusters')
-    # create a fake instance
-    instance = Instance.create_random_instance(df_discrete.copy(deep=False), 0.5)
-    # cluster_index = list(clusters.keys())[0]
-
-    selected_clusters = [6,7,8,9,11,20]
-
-    ncol = 2
-    nrows = int(len(selected_clusters)/float(ncol))
-    fix, axs = plt.subplots(nrows, ncol)
-    axs = axs.flat
-    ind_plot = 0
-    for cluster_index in selected_clusters:
-        ax = axs[ind_plot]
-        body =  [ instance.get_atom_index(graph.atoms[index]) for index in clusters[ cluster_index ] ]
-        # fig, ax = plt.subplots()
-        ax.set_title('cluster ' + str(cluster_index))
-        plot_cluster_umap(df_discrete, df_umap, instance, body, ax)
-        ind_plot += 1
+    #
+    # ncol = 2
+    # nrows = 2
+    # fig, axs = plt.subplots(nrows, ncol)
+    # fig.suptitle('clusters graphe coexpr T cells')
+    # axs = axs.flat
+    # ind_plot = 0
+    # for cluster_index in clusters_coexpr_T:
+    #     ax = axs[ind_plot]
+    #     body =  [ instance.get_atom_index(graph_coexpr_T.atoms[index]) for index in clusters_coexpr_T[ cluster_index ] ]
+    #     # fig, ax = plt.subplots()
+    #     ax.set_title('cluster ' + str(cluster_index))
+    #     plot_cluster_umap(df_discrete, df_umap, instance, body, ax)
+    #     ind_plot += 1
+    #
+    # ########################################################################""
 
 
-    # plot a single gene
-    gene = 'PPBP'
-    gene = 'S100A4'
-    gene = 'ANXA1'
-    gene = 'DERL3'
 
+
+
+
+    # ########################################################################""
+
+    # print('plot the clusters')
+    # # create a fake instance
+    # instance = Instance.create_random_instance(df_discrete.copy(deep=False), 0.5)
+    # # cluster_index = list(clusters.keys())[0]
+    #
+    # selected_clusters = [6,7,8,9,11,20]
+    #
+    # ncol = 2
+    # nrows = int(len(selected_clusters)/float(ncol))
+    # fix, axs = plt.subplots(nrows, ncol)
+    # axs = axs.flat
+    # ind_plot = 0
+    # for cluster_index in selected_clusters:
+    #     ax = axs[ind_plot]
+    #     body =  [ instance.get_atom_index(graph.atoms[index]) for index in clusters[ cluster_index ] ]
+    #     # fig, ax = plt.subplots()
+    #     ax.set_title('cluster ' + str(cluster_index))
+    #     plot_cluster_umap(df_discrete, df_umap, instance, body, ax)
+    #     ind_plot += 1
+
+    # ########################################################################""
+
+
+
+
+    # # plot a single gene
+    # gene = 'PPBP'
+    # gene = 'S100A4'
+    # gene = 'ANXA1'
+    # gene = 'DERL3'
+    #
+    # fig, ax = plt.subplots()
+    # ax.set_title('gene ' + gene)
+    # plot_gene_umap(df_normalized, df_umap, gene, ax)
+
+
+
+
+    # plot cluster 8
     fig, ax = plt.subplots()
-    ax.set_title('gene ' + gene)
-    plot_gene_umap(df_normalized, df_umap, gene, ax)
+    body =  [ instance.get_atom_index(graph.atoms[index]) for index in clusters[ 8 ] ]
+    plot_cluster_umap(df_discrete, df_umap, instance, body, ax)
+    ax.set_title('Cluster 8 error on the cells')
+
+    # cluster 8 histogram
+    histo = histogram.Histogram(instance, body, histogram.Histogram_type.GLOBAL)
+    values = [ error for error in range(len(histo.positive_histogram)) for _ in histo.positive_histogram[error] ]
+    fig,ax = plt.subplots()
+    ax.hist(values, 50, density=True, edgecolor='black')
+    ax.set_ylabel('proportion de cellules')
+    ax.set_xlabel('erreur de couverture')
+
+    # threshold <= 140
+    selected_cells = []
+    for i in range(190):
+        selected_cells += histo.positive_histogram[i]
+    print(selected_cells)
+
+    T_cells = list(df_cell_macrotypes.loc[df_cell_macrotypes['cellType_macro'] == 'T'].index)
+
+    print(T_cells)
+
+    selected_cells = [cell for cell in selected_cells if cell in T_cells]
+    other_cells = [cell for cell in T_cells if not cell in selected_cells]
+
+    df_selected_cells = pd.DataFrame([1]*len(selected_cells)+[0]*len(other_cells), index = selected_cells+other_cells, columns=['X'])
+    print(df_selected_cells)
+    print(selected_cells+other_cells)
+    df_selected_cells.to_csv('selected_cells_dynamics_c20.csv')
+
+    fig,ax = plt.subplots()
+    ax.scatter(df_umap['UMAP_1'][:], df_umap['UMAP_2'][:], s=5, c=['red'  if cell in selected_cells else 'black' for cell in df_umap.index])
+
+    # print('cluster 8:')
+    # print_cluster_latex(instance, [graph.atoms[index] for index in clusters[ 8 ]])
+
+    # # plot cluster 20
+    # fig, ax = plt.subplots()
+    # body =  [ instance.get_atom_index(graph.atoms[index]) for index in clusters[ 20 ] ]
+    # plot_cluster_umap(df_discrete, df_umap, instance, body, ax)
+    # ax.set_title('Cluster 20 error on the cells')
+
+
+    # print('cluster 20:')
+    # print_cluster_latex(instance, [graph.atoms[index] for index in clusters[ 20 ]])
 
     plt.show()
 

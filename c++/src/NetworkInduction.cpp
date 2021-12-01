@@ -214,7 +214,7 @@ void NetworkInduction::computeNetwork(DataFrame<uint>& dataset, double selection
 
 
 /*----------------------------------------------------------------------------*/
-void NetworkInduction::computeRegulationNetwork(DataFrame<uint>& dataset, NGraph successors, double trRate, uint predNeq, double selectionThreshold, string output_filename) {
+void NetworkInduction::computeRegulationNetwork(DataFrame<uint>& dataset, NGraph successors, double trRate, uint predNeq, double selectionThreshold, string output_filename, uint max_edges) {
 
   uint nVar = dataset.nColumns();
 
@@ -314,6 +314,11 @@ void NetworkInduction::computeRegulationNetwork(DataFrame<uint>& dataset, NGraph
       #endif
 
       solver.computeBestAtomsThreshold(selectionThreshold, atomsNetwork, atomsNetworkScores);
+
+      if(max_edges > 0 && atomsNetwork.size() > max_edges) {
+        atomsNetwork.resize(max_edges);
+        atomsNetworkScores.resize(max_edges);
+      }
 
       #if DEBUG_LOG == 1
       debugStr += "n atoms selected: " + to_string(atomsNetwork.size()) + "\n";
