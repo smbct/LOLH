@@ -37,6 +37,8 @@ class Parameters {
 
       threshold = -1.;
 
+      max_edges = 0;
+
       /****************************/
 
       input_transitions = "";
@@ -87,6 +89,8 @@ class Parameters {
     /* consider as transitions the extremity of a path of a certain length */
     uint transition_delay;
 
+    /* maximum number of edges in the coexpression or dynamical graph */
+    uint max_edges;
 
 };
 
