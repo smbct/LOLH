@@ -26,8 +26,10 @@ class NetworkInduction {
      * \param dataset the dataset
      * \param selectionThreshold the min relative distance of selected genes
      * \param output_filename the name of the ouput file
+     * \param negativeCells ???
+     * \param maxEdges max number of edges, if 0, no limits
      */
-    static void computeNetwork(DataFrame<uint>& dataset, double selectionThreshold, std::string output_filename, std::vector<bool>* negativeCells = nullptr);
+    static void computeNetwork(DataFrame<uint>& dataset, double selectionThreshold, std::string output_filename, std::vector<bool>* negativeCells = nullptr, uint maxEdges = 0);
 
     /*!
      * \brief compute a regulatory network for all genes (fast version)

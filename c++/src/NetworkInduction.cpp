@@ -19,7 +19,7 @@ using namespace std;
 
 
 /*----------------------------------------------------------------------------*/
-void NetworkInduction::computeNetwork(DataFrame<uint>& dataset, double selectionThreshold, string output_filename, vector<bool>* negativeCells) {
+void NetworkInduction::computeNetwork(DataFrame<uint>& dataset, double selectionThreshold, string output_filename, vector<bool>* negativeCells, uint maxEdges) {
 
   // cout << dataset.toString() << endl;
 
@@ -152,6 +152,11 @@ void NetworkInduction::computeNetwork(DataFrame<uint>& dataset, double selection
       // solver.computekBestAtoms(nGenes, atomsNetwork, atomsNetworkScores);
       // selectionThreshold = 0.3;
       solver.computeBestAtomsThreshold(selectionThreshold, atomsNetwork, atomsNetworkScores);
+
+      if(maxEdges > 0 && atomsNetwork.size() > maxEdges) {
+        atomsNetwork.resize(maxEdges);
+        atomsNetworkScores.resize(maxEdges);
+      }
 
       #if DEBUG_LOG == 1
       debugStr += "n atom selected: " + to_string(atomsNetwork.size()) + "\n";

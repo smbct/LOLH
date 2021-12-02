@@ -460,7 +460,7 @@ class Graph:
                 ax.lines[ind].set_color(colorConverter.to_rgba('black', alpha=self.weights[ind]))
                 ax.lines[ind].set_linewidth( self.weights[ind] )
 
-        ax.set_aspect('equal')
+        # ax.set_aspect('equal')
 
         return
 
