@@ -173,7 +173,7 @@ void computeCoexpression(Parameters param) {
 
   if(param.compute_network) {
     if(param.threshold >= 0) {
-      NetworkInduction::computeNetwork(dataset, param.threshold, param.output_file);
+      NetworkInduction::computeNetwork(dataset, param.threshold, param.output_file, nullptr, param.max_edges);
     } else {
       /* error */
     }
