@@ -356,6 +356,7 @@ def global_analysis():
     # cluster_index = list(clusters.keys())[0]
 
     selected_clusters = [6,7,8,9,11,20]
+    selected_clusters = [cl for cl in clusters]
 
     ncol = 2
     nrows = int(len(selected_clusters)/float(ncol))
@@ -436,36 +437,54 @@ def global_analysis():
     # print('cluster 20:')
     # print_cluster_latex(instance, [graph.atoms[index] for index in clusters[ 20 ]])
 
-    # create a dataset with all the clusters
-    # data = []
-    # for cluster_index in clusters:
-    #     for atom_index in clusters[cluster_index]:
-    #         atom = graph.atoms[atom_index]
-    #         data.append([atom[0], atom[1], cluster_index])
-    #
-    # df_dynamical_clusters = pd.DataFrame(data, columns=['gene', 'gene discrete value', 'cluster index'])
-    # print(df_dynamical_clusters.head())
-    # df_dynamical_clusters.to_csv('dynamical_clusters.csv')
+    output_clusters_edges = False
+    if output_clusters_edges:
+        # create a dataset with all the clusters
+        data = []
+        for cluster_index in clusters:
+            for atom_index in clusters[cluster_index]:
+                atom = graph.atoms[atom_index]
+                data.append([atom[0], atom[1], cluster_index])
 
-    # look for edges connecting the clusters
-    connecting_edges = []
-    # build a table of the cluster indexes of the atoms
-    atom_to_cluster_index = {}
-    for cluster_index in clusters:
-        for atom_index in clusters[cluster_index]:
-            atom_to_cluster_index[graph.atoms[atom_index]] = cluster_index
-    for edge in graph.edges:
-        atom_left = graph.atoms[edge[0]]
-        atom_right = graph.atoms[edge[1]]
-        if atom_left in atom_to_cluster_index and atom_right in atom_to_cluster_index:
-            if atom_to_cluster_index[atom_left] != atom_to_cluster_index[atom_right]:
-                print('edge: ', atom_left, ' ', atom_to_cluster_index[atom_left], ' -> ', atom_right, ' ', atom_to_cluster_index[atom_right])
-                connecting_edges.append([atom_left[0], atom_left[1], atom_to_cluster_index[atom_left], atom_right[0], atom_right[1], atom_to_cluster_index[atom_right]])
+        df_dynamical_clusters = pd.DataFrame(data, columns=['gene', 'gene discrete value', 'cluster index'])
+        print(df_dynamical_clusters.head())
+        df_dynamical_clusters.to_csv('dynamical_clusters.csv')
 
-    connecting_edges.sort(key=lambda elt: (elt[2], elt[5], elt[0], elt[3]))
+        # look for edges connecting the clusters
+        connecting_edges = []
+        # build a table of the cluster indexes of the atoms
+        atom_to_cluster_index = {}
+        for cluster_index in clusters:
+            for atom_index in clusters[cluster_index]:
+                atom_to_cluster_index[graph.atoms[atom_index]] = cluster_index
+        for edge in graph.edges:
+            atom_left = graph.atoms[edge[0]]
+            atom_right = graph.atoms[edge[1]]
+            if atom_left in atom_to_cluster_index and atom_right in atom_to_cluster_index:
+                if atom_to_cluster_index[atom_left] != atom_to_cluster_index[atom_right]:
+                    print('edge: ', atom_left, ' ', atom_to_cluster_index[atom_left], ' -> ', atom_right, ' ', atom_to_cluster_index[atom_right])
+                    connecting_edges.append([atom_left[0], atom_left[1], atom_to_cluster_index[atom_left], atom_right[0], atom_right[1], atom_to_cluster_index[atom_right]])
 
-    df_connecting_edges = pd.DataFrame(connecting_edges, columns=['left gene', 'left value', 'left cluster', 'right gene', 'right value', 'right cluster'])
-    df_connecting_edges.to_csv('dynmical_connecting_edges.csv')
+        connecting_edges.sort(key=lambda elt: (elt[2], elt[5], elt[0], elt[3]))
+
+        df_connecting_edges = pd.DataFrame(connecting_edges, columns=['left gene', 'left value', 'left cluster', 'right gene', 'right value', 'right cluster'])
+        df_connecting_edges.to_csv('dynmical_connecting_edges.csv')
+
+    paired_clusters = [(0,6), (1,7), (2,8), (3,9), (4,11), (20,23)]
+
+    for elt in paired_clusters:
+        ind_1 = elt[0]
+        ind_2 = elt[1]
+        genes_c1 = [graph.atoms[index][0] for index in clusters[ind_1]]
+        genes_c2 = [graph.atoms[index][0] for index in clusters[ind_2]]
+        shared = [elt for elt in genes_c1 if elt in genes_c2]
+        print('between cluster ', ind_1, '(', len(genes_c1), ') and ', ind_2, '(', len(genes_c2), ') genes: ', len(shared), ' genes are shared')
+
+    # compare clusters
+    # for ind_1 in clusters:
+        # for ind_2 in clusters:
+            # if ind_1 < ind_2:
+
 
     plt.show()
 

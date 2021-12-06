@@ -124,8 +124,8 @@ def plot_LOLH_PRIDE_scores(instance, LOLH_rule, LOLH_score, PRIDE_rules, PRIDE_s
 
     ax.set_xlim((0, 1.))
     ax.set_ylim((0, 1.))
-    ax.set_xlabel('score positif')
-    ax.set_ylabel('score négatif')
+    ax.set_xlabel('erreur positive')
+    ax.set_ylabel('erreur négative')
 
     ax.set_aspect('equal')
 
@@ -174,25 +174,25 @@ def plot_atoms(instance, LOLH_atoms, PRIDE_atoms):
     cmap = plt.get_cmap('viridis')
 
     # plot LOLH atoms
-    ax.scatter([instance.atom_score[ind_atom][0] for ind_atom in LOLH_atoms], [instance.atom_score[ind_atom][1] for ind_atom in LOLH_atoms], marker='x', color='#008e1c', zorder=2, label='atomes LOLH')
+    ax.scatter([instance.atom_score[ind_atom][0] for ind_atom in LOLH_atoms], [instance.atom_score[ind_atom][1] for ind_atom in LOLH_atoms], marker='X', s=50, linewidth=1, edgecolor='k', color='limegreen', zorder=2, label='atomes LOLH')
 
     # plot pride atoms
-    ax.scatter([instance.atom_score[ind_atom][0] for ind_atom in PRIDE_atoms], [instance.atom_score[ind_atom][1] for ind_atom in PRIDE_atoms], marker='x', color='#d00000', zorder=2, label='atomes PRIDE')
+    ax.scatter([instance.atom_score[ind_atom][0] for ind_atom in PRIDE_atoms], [instance.atom_score[ind_atom][1] for ind_atom in PRIDE_atoms], marker='X', s=50, linewidth=1, edgecolor='k', color='red', zorder=2, label='atomes PRIDE')
 
     # other (not used) atoms
     ax.scatter([instance.atom_score[ind_atom][0] for ind_atom in other_atoms], [instance.atom_score[ind_atom][1] for ind_atom in other_atoms], alpha=0.5, marker='x', zorder=0, label='autres atomes')
 
     # score = 0.0
-    ax.plot([0, instance.n_positives()], [0, instance.n_negatives()], color='black', linestyle='--', label='score = 0.0', lw=1.5)
+    ax.plot([0, instance.n_positives()], [0, instance.n_negatives()], color='black', linestyle='--', label='score = 0.0', lw=1.5, zorder=1)
 
     # line for score = 0.6
     selection_score = 0.6
     # A = (0,selection_score*instance.n_negatives())
     # B = (instance.n_positives()*(1.-selection_score), instance.n_negatives())
     A,B = compute_A_B(instance, selection_score)
-    ax.plot([A[0], B[0]], [A[1], B[1]], color='black', label='score = 0.6', lw=1.5)
+    ax.plot([A[0], B[0]], [A[1], B[1]], color='black', label='score = 0.6', lw=1.5, zorder=1)
 
-    ax.legend(loc='lower right')
+    ax.legend(loc='upper left', bbox_to_anchor= (1.01, 1.01))
 
     ax.set_aspect('equal')
     fig.tight_layout()
@@ -244,14 +244,14 @@ def multiobjective_comparison(instance, solver):
 
     body_length = 10
     biobj_score, biobj_bodies, biobj_weight = solver.compute_supported(body_length, 1, 1)
-    biobj_score = [ (score[0]/float(instance.n_positives()), score[1]/float(instance.n_negatives())) for score in biobj_score]
+    biobj_score = [ (score[0]/float(instance.n_positives()*body_length), score[1]/float(instance.n_negatives()*body_length)) for score in biobj_score]
 
     # selection of two "extreme" rules
     ind_left = 0
     for ind in range(len(biobj_score)):
         score = biobj_score[ind]
-        if score[0] >= 0.4 and score[0] <= 0.6:
-            if score[1] >= 6.4 and score[1] <= 6.8:
+        if score[0] >= 0.4/body_length and score[0] <= 0.6/body_length:
+            if score[1] >= 6.4/body_length and score[1] <= 6.8/body_length:
                 print('left: ', ind)
                 ind_left = ind
     print('left body: ', biobj_bodies[ind_left])
@@ -260,8 +260,8 @@ def multiobjective_comparison(instance, solver):
     ind_right = 0
     for ind in range(len(biobj_score)):
         score = biobj_score[ind]
-        if score[0] >= 3.6 and score[0] <= 4.0:
-            if score[1] >= 9.5 and score[1] <= 9.7:
+        if score[0] >= 3.6/body_length and score[0] <= 4.0/body_length:
+            if score[1] >= 9.5/body_length and score[1] <= 9.7/body_length:
                 print('right: ', ind)
                 ind_right = ind
     print('right body: ', biobj_bodies[ind_right])
@@ -269,20 +269,20 @@ def multiobjective_comparison(instance, solver):
 
     fig, ax = plt.subplots()
     # ax.set_title('Score des règles bi-objectives')
-    ax.set_xlabel('score positif')
-    ax.set_ylabel('score négatif')
+    ax.set_xlabel('erreur positive')
+    ax.set_ylabel('erreur négative')
     ind_reduced = [ind for ind in range(len(biobj_score)) if ind != ind_left and ind != ind_right]
     ax.scatter([biobj_score[ind][0] for ind in ind_reduced], [biobj_score[ind][1] for ind in ind_reduced], marker='x', s=25)
     ax.scatter([biobj_score[ind_left][0], biobj_score[ind_right][0]], [biobj_score[ind_left][1], biobj_score[ind_right][1]], color='red', marker='x', s=30)
-    ax.text(5-0.3, 5+0.3, 'score négatif - score positif = 0', horizontalalignment='center', verticalalignment='center', rotation=45)
-    ax.plot([0, body_length], [0, body_length], '--', color='k')
+    ax.text((5-0.3)/body_length, (5+0.3)/body_length, 'score = 0', horizontalalignment='center', verticalalignment='center', rotation=45)
+    ax.plot([0, 1.], [0, 1.], '--', color='k')
 
-    ax.text(left_score[0] + 0.2, left_score[1]-0.2, r'$r_1$')
-    ax.text(right_score[0] + 0.0, right_score[1]-0.6, r'$r_2$')
+    ax.text(left_score[0] + 0.2/body_length, left_score[1]-0.2/body_length, r'$r_1$')
+    ax.text(right_score[0] + 0.0, right_score[1]-0.6/body_length, r'$r_2$')
 
-    delta = 0.5
-    ax.set_xlim((0-delta, body_length+delta))
-    ax.set_ylim((0-delta, body_length+delta))
+    delta = 0.5/body_length
+    ax.set_xlim((0-delta, 1.0+delta))
+    ax.set_ylim((0-delta, 1.0+delta))
     ax.set_aspect('equal')
 
     histo_left = histogram.Histogram(instance, biobj_bodies[ind_left])
@@ -308,7 +308,7 @@ def rule_histograms_comparisons(instance, solver):
     fig, ax = plt.subplots()
     ax.set_xlim([0, instance.n_positives()])
     ax.set_ylim([0, instance.n_negatives()])
-    ax.scatter([instance.atom_score[ind][0] for ind in range(instance.n_atoms())], [instance.atom_score[ind][1] for ind in range(instance.n_atoms())], marker='x', zorder=1, alpha=0.5)
+
     # ax.set_title('Visualisation de plusieurs règles logiques')
     # ax.plot([0, nPos], [0, nNeg], '--', color='grey', zorder=3, alpha=0.7)
     ax.set_xlabel('erreur positive')
@@ -330,38 +330,48 @@ def rule_histograms_comparisons(instance, solver):
     nAtomsSel = 10
     body_worst = atoms_sandwich[:nAtomsSel]
     print('body: ', body_worst)
-    ax.scatter([instance.atom_score[ind_atom][0] for ind_atom in body_worst], [instance.atom_score[ind_atom][1] for ind_atom in body_worst], marker='x', color='#f64c4c', zorder=4)
+    # ax.scatter([instance.atom_score[ind_atom][0] for ind_atom in body_worst], [instance.atom_score[ind_atom][1] for ind_atom in body_worst], marker='x', color='#f64c4c', zorder=4)
+    ax.scatter([instance.atom_score[ind_atom][0] for ind_atom in body_worst], [instance.atom_score[ind_atom][1] for ind_atom in body_worst], marker='X', s=50, color='limegreen', linewidth=1, edgecolor='k', zorder=4, label='règle sous-optimale')
+
+
     # histogramme
     histo = histogram.Histogram(instance, body_worst)
     axsh[0,0].set_title('Règle sous-optimale')
     visualizer.plot_histograms(axsh[0,0], histo, True)
 
 
-    ax.fill([A1[0], B1[0], B2[0], A2[0]], [A1[1], B1[1], B2[1], A2[1]], zorder=3, color='green', alpha=0.3, label='règle sous-optimale')
-    ax.plot([A1[0], B1[0]], [A1[1], B1[1]], '--', color='k', zorder=3)
-    ax.plot([A2[0], B2[0]], [A2[1], B2[1]], '--', color='k', zorder=3)
+    # ax.fill([A1[0], B1[0], B2[0], A2[0]], [A1[1], B1[1], B2[1], A2[1]], zorder=3, color='green', alpha=0.3, label='règle sous-optimale')
+    # ax.plot([A1[0], B1[0]], [A1[1], B1[1]], '--', color='k', zorder=3)
+    # ax.plot([A2[0], B2[0]], [A2[1], B2[1]], '--', color='k', zorder=3)
+
+
+
 
     score1 = -0.7
     score2 = -0.6
     A1, B1 = compute_A_B(instance, score1)
-
     A2, B2 = compute_A_B(instance, score2)
-
     selected_atoms, scores = solver.select_best_atoms_threshold(-1.)
     atoms_sandwich = [selected_atoms[ind] for ind in range(len(selected_atoms)) if scores[ind] >= score1 and scores[ind] <= score2]
     np.random.shuffle(atoms_sandwich)
     nAtomsSel = 10
-    body_worst = atoms_sandwich[:nAtomsSel]
+    body_inverse = atoms_sandwich[:nAtomsSel]
     print('body: ', body_worst)
-    ax.scatter([instance.atom_score[ind_atom][0] for ind_atom in body_worst], [instance.atom_score[ind_atom][1] for ind_atom in body_worst], marker='x', color='#f64c4c', zorder=4)
+    # ax.scatter([instance.atom_score[ind_atom][0] for ind_atom in body_worst], [instance.atom_score[ind_atom][1] for ind_atom in body_worst], marker='x', color='#f64c4c', zorder=4)
+    # ax.scatter([instance.atom_score[ind_atom][0] for ind_atom in body_inverse], [instance.atom_score[ind_atom][1] for ind_atom in body_inverse], marker='X', s=50, color='darkorchid', linewidth=1, edgecolor='k', zorder=4, label='règle inverse')
+
     # histogramme
-    histo = histogram.Histogram(instance, body_worst)
+    histo = histogram.Histogram(instance, body_inverse)
     axsh[0,1].set_title('Règle inverse')
     visualizer.plot_histograms(axsh[0,1], histo, True)
 
-    ax.fill([A1[0], B1[0], B2[0], A2[0]], [A1[1], B1[1], B2[1], A2[1]], zorder=3, color='orange', alpha=0.3, label='règle inverse')
-    ax.plot([A1[0], B1[0]], [A1[1], B1[1]], '--', color='k', zorder=3)
-    ax.plot([A2[0], B2[0]], [A2[1], B2[1]], '--', color='k', zorder=3)
+    # ax.fill([A1[0], B1[0], B2[0], A2[0]], [A1[1], B1[1], B2[1], A2[1]], zorder=3, color='orange', alpha=0.3, label='règle inverse')
+    # ax.plot([A1[0], B1[0]], [A1[1], B1[1]], '--', color='k', zorder=3)
+    # ax.plot([A2[0], B2[0]], [A2[1], B2[1]], '--', color='k', zorder=3)
+
+
+
+
 
     score1 = -0.05
     score2 = 0.05
@@ -373,16 +383,25 @@ def rule_histograms_comparisons(instance, solver):
     nAtomsSel = 10
     body_worst = atoms_sandwich[:nAtomsSel]
     print('body: ', body_worst)
-    ax.scatter([instance.atom_score[ind_atom][0] for ind_atom in body_worst], [instance.atom_score[ind_atom][1] for ind_atom in body_worst], marker='x', color='#f64c4c', zorder=4, label='atomes sélectionnés')
+    # ax.scatter([instance.atom_score[ind_atom][0] for ind_atom in body_worst], [instance.atom_score[ind_atom][1] for ind_atom in body_worst], marker='x', color='#f64c4c', zorder=4, label='atomes sélectionnés')
+
+    ax.scatter([instance.atom_score[ind_atom][0] for ind_atom in body_worst], [instance.atom_score[ind_atom][1] for ind_atom in body_worst], marker='X', s=50, color='red', linewidth=1, edgecolor='k', zorder=4, label='règle inappropriée')
+
     # histogramme
     histo = histogram.Histogram(instance, body_worst)
     axsh[1,0].set_title('Règle inappropriée')
     visualizer.plot_histograms(axsh[1,0], histo, True)
 
+    # ax.fill([A1[0], B1[0], B2[0], A2[0]], [A1[1], B1[1], B2[1], A2[1]], zorder=3, color='red', alpha=0.3, label='règle inappropriée')
+    # ax.plot([A1[0], B1[0]], [A1[1], B1[1]], '--', color='k', zorder=3)
+    # ax.plot([A2[0], B2[0]], [A2[1], B2[1]], '--', color='k', zorder=3)
 
-    ax.fill([A1[0], B1[0], B2[0], A2[0]], [A1[1], B1[1], B2[1], A2[1]], zorder=3, color='red', alpha=0.3, label='règle inappropriée')
-    ax.plot([A1[0], B1[0]], [A1[1], B1[1]], '--', color='k', zorder=3)
-    ax.plot([A2[0], B2[0]], [A2[1], B2[1]], '--', color='k', zorder=3)
+
+
+
+    ax.scatter([instance.atom_score[ind_atom][0] for ind_atom in body_inverse], [instance.atom_score[ind_atom][1] for ind_atom in body_inverse], marker='X', s=50, color='darkorchid', linewidth=1, edgecolor='k', zorder=4, label='règle inverse')
+
+
 
     atomes = [ind for ind in range(instance.n_atoms())]
     np.random.shuffle(atomes)
@@ -391,17 +410,29 @@ def rule_histograms_comparisons(instance, solver):
     axsh[1,1].set_title('Règle aléatoire')
     visualizer.plot_histograms(axsh[1,1], histo, True)
 
+    ax.scatter([instance.atom_score[ind_atom][0] for ind_atom in body_random], [instance.atom_score[ind_atom][1] for ind_atom in body_random], marker='X', color='orange', linewidth=1, edgecolor='k', zorder=4, label='règle aléatoire', s=50)
 
-    legend = ax.legend(loc='lower left')
 
-    handles_old, labels_old = ax.get_legend_handles_labels()
 
-    new_handles = []
-    for ind_handle in range(len(handles_old)-1):
-        patch = handles_old[ind_handle]
-        new_handles.append(Patch(edgecolor='k', facecolor=colorConverter.to_rgba(patch.get_facecolor(), alpha=0.3), linewidth=0.5, label=labels_old[ind_handle]))
-    new_handles.append(handles_old[-1])
-    ax.legend(loc='lower left', handles=new_handles, labels=labels_old)
+    ax.scatter([instance.atom_score[ind][0] for ind in range(instance.n_atoms())], [instance.atom_score[ind][1] for ind in range(instance.n_atoms())], marker='x', zorder=1, alpha=0.5, label='autres atomes')
+
+
+
+    ax.plot([0, instance.n_positives()], [0, instance.n_negatives()], '--', color='black', zorder=3)
+
+
+
+
+    legend = ax.legend(loc='upper left', bbox_to_anchor= (1.01, 1.01))
+
+    # handles_old, labels_old = ax.get_legend_handles_labels()
+    #
+    # new_handles = []
+    # for ind_handle in range(len(handles_old)-1):
+    #     patch = handles_old[ind_handle]
+    #     new_handles.append(Patch(edgecolor='k', facecolor=colorConverter.to_rgba(patch.get_facecolor(), alpha=0.3), linewidth=0.5, label=labels_old[ind_handle]))
+    # new_handles.append(handles_old[-1])
+    # ax.legend(loc='lower left', handles=new_handles, labels=labels_old)
 
     return
 

@@ -1,5 +1,5 @@
 /*!
- * \file TransitionEmbeddingc.cpp
+ * \file TransitionEmbedding.cpp
  * \author S. Buchet
  * \brief implementation of a class TransitionEmbedding
  */
@@ -311,7 +311,7 @@ void TransitionEmbedding::computeTransitionProbabilities() {
       /* iterate over all the neighbours */
       auto& neighbours = _neighbours[cell];
       // auto& probaIt = _transitionProbabilites.insert(pair<string, vector<double>>(cell, vector<double>(neighbours.size()))).first->second; /* warining: transitions are not inserted if the partial successor does not exist */
-      /* TODO warining potentially dangerous on multi core exacution */
+      /* TODO warning potentially dangerous on multi core exacution */
 
       auto transitionMapIterator = _transitionProbabilites.find(cell);
       auto& probaIt = transitionMapIterator->second;
