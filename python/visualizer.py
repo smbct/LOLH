@@ -132,18 +132,18 @@ def plot_histograms(ax, histo, normalize = True, instance_info = None):
     ax.set_xticks(x_positions)
     ax.set_xticklabels([elt for elt in range(error_max+1)])
 
-    # ax.set_xlabel('Rule matching error on samples')
-    ax.set_xlabel('Erreur de couverture')
-    # ax.set_ylabel('Number of samples')
-    ax.set_ylabel('Proportion d\'états')
+    ax.set_xlabel('Rule matching error on samples')
+    # ax.set_xlabel('Erreur de couverture')
+    ax.set_ylabel('Number of samples')
+    # ax.set_ylabel('Proportion d\'états')
 
     # pos_patch = Patch(facecolor=colorConverter.to_rgba('green', alpha=0.5), label=r'$\mathcal{S}^+$', edgecolor='k', linewidth=0.5)
-    pos_patch = Patch(facecolor=colorConverter.to_rgba('green', alpha=0.5), label='exemples positifs', edgecolor='k', linewidth=0.5)
-    neg_patch = Patch(facecolor=colorConverter.to_rgba('red', alpha=0.5), label='exemples négatifs', edgecolor='k', linewidth=0.5)
+    pos_patch = Patch(facecolor=colorConverter.to_rgba('green', alpha=0.5), label='positive examples', edgecolor='k', linewidth=0.5)
+    neg_patch = Patch(facecolor=colorConverter.to_rgba('red', alpha=0.5), label='negative examples', edgecolor='k', linewidth=0.5)
     ax.legend(handles=[pos_patch, neg_patch])
-    
+
     ax.set_ylim((0,0.6))
-    
+
     # if instance_info is None:
     #     ax.set_title('Matching score over all samples')
     # else:
