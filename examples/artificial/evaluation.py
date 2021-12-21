@@ -93,14 +93,18 @@ def dimensionality_reduction(df):
 
     fig, axs = plt.subplots(1,2)
 
+    fig.suptitle('Dimensionality reduction on the artificial dataset')
+
     col = ['forestgreen' for _ in range(int(df.shape[0]/2))] + ['darkred' for _ in range(int(df.shape[0]/2))]
 
     axs[0].scatter(embedding[:, 0], embedding[:, 1], s=0.5, c=col)
     # axs[0].set_aspect('equal', 'datalim')
-    axs[0].set_title('projection UMAP')
+    # axs[0].set_title('projection UMAP')
+    axs[0].set_title('UMAP projection')
     axs[0].set_xlabel('UMAP 1')
     axs[0].set_ylabel('UMAP 2')
-    axs[0].legend(handles=[mpatches.Patch(color='forestgreen', label='exemples positifs'), mpatches.Patch(color='darkred', label='exemples négatifs')], loc='lower right')
+    # axs[0].legend(handles=[mpatches.Patch(color='forestgreen', label='exemples positifs'), mpatches.Patch(color='darkred', label='exemples négatifs')], loc='lower right')
+    axs[0].legend(handles=[mpatches.Patch(color='forestgreen', label='positive examples'), mpatches.Patch(color='darkred', label='negative examples')], loc='lower right')
     axs[0].set_aspect((axs[0].get_xlim()[1]-axs[0].get_xlim()[0])/(axs[0].get_ylim()[1]-axs[0].get_ylim()[0]))
 
     # PCA projection
@@ -108,10 +112,12 @@ def dimensionality_reduction(df):
     X=StandardScaler().fit_transform(X)
     X_pca = PCA(n_components=2).fit_transform(X)
     axs[1].scatter(X_pca[:,0], X_pca[:,1], c=col, s=0.5)
-    axs[1].set_title('projection PCA')
+    # axs[1].set_title('projection PCA')
+    axs[1].set_title('PCA projection')
     axs[1].set_xlabel('PCA 1')
     axs[1].set_ylabel('PCA 2')
-    axs[1].legend(handles=[mpatches.Patch(color='forestgreen', label='exemples positifs'), mpatches.Patch(color='darkred', label='exemples négatifs')])
+    # axs[1].legend(handles=[mpatches.Patch(color='forestgreen', label='exemples positifs'), mpatches.Patch(color='darkred', label='exemples négatifs')])
+    axs[1].legend(handles=[mpatches.Patch(color='forestgreen', label='positive examples'), mpatches.Patch(color='darkred', label='negative examples')])
     axs[1].set_aspect((axs[1].get_xlim()[1]-axs[1].get_xlim()[0])/(axs[1].get_ylim()[1]-axs[1].get_ylim()[0]))
 
     return
@@ -124,8 +130,12 @@ def plot_LOLH_PRIDE_scores(instance, LOLH_rule, LOLH_score, PRIDE_rules, PRIDE_s
 
     ax.set_xlim((0, 1.))
     ax.set_ylim((0, 1.))
-    ax.set_xlabel('erreur positive')
-    ax.set_ylabel('erreur négative')
+    # ax.set_xlabel('erreur positive')
+    ax.set_xlabel('positive error')
+    # ax.set_ylabel('erreur négative')
+    ax.set_ylabel('negative error')
+
+    ax.set_title('Comparison of PRIDE and LOLH normalized rule scores')
 
     ax.set_aspect('equal')
 
@@ -144,10 +154,15 @@ def plot_LOLH_PRIDE_scores(instance, LOLH_rule, LOLH_score, PRIDE_rules, PRIDE_s
     cnorm = mcolors.Normalize(vmin=shortest_PRIDE_rule, vmax=longest_PRIDE_rule)
 
 
-    ax.scatter([score[0] for score in PRIDE_scores_sorted], [score[1] for score in PRIDE_scores_sorted], c=colors, norm=cnorm, cmap=plt.get_cmap('viridis'), marker='x',  zorder=1, label='règles PRIDE', facecolor='darkblue')
+    # ax.scatter([score[0] for score in PRIDE_scores_sorted], [score[1] for score in PRIDE_scores_sorted], c=colors, norm=cnorm, cmap=plt.get_cmap('viridis'), marker='x',  zorder=1, label='règles PRIDE', facecolor='darkblue')
+    ax.scatter([score[0] for score in PRIDE_scores_sorted], [score[1] for score in PRIDE_scores_sorted], c=colors, norm=cnorm, cmap=plt.get_cmap('viridis'), marker='x',  zorder=1, label='PRIDE rule', facecolor='darkblue')
+
     cbar = fig.colorbar(cm.ScalarMappable(norm=cnorm, cmap=plt.get_cmap('viridis')), ax=ax)
-    cbar.set_label('longueur des règles PRIDE')
-    ax.scatter(LOLH_score[0], LOLH_score[1], marker='o', s=20, color='chocolate', zorder=1, label='règle LOLH') # plot the optimized rule
+    # cbar.set_label('longueur des règles PRIDE')
+    cbar.set_label('PRIDE rules length')
+
+    ax.scatter(LOLH_score[0], LOLH_score[1], marker='o', s=20, color='chocolate', zorder=1, label='LOLH rule') # plot the optimized rule
+    # ax.scatter(LOLH_score[0], LOLH_score[1], marker='o', s=20, color='chocolate', zorder=1, label='règle LOLH') # plot the optimized rule
     # plot the domination cone of the optimized rule
     ax.plot([LOLH_score[0], LOLH_score[0]], [LOLH_score[1], 0], linestyle='--', color='darkgrey', zorder=0)
     ax.plot([LOLH_score[0], 1.], [LOLH_score[1], LOLH_score[1]], linestyle='--', color='darkgrey', zorder=0)
@@ -165,22 +180,27 @@ def plot_atoms(instance, LOLH_atoms, PRIDE_atoms):
     ax.set_xlim((0,instance.n_positives()))
     ax.set_ylim((0,instance.n_negatives()))
 
-    # ax.set_title('Atoms score')
-    ax.set_xlabel('erreur positive')
-    ax.set_ylabel('erreur négative')
+    ax.set_title('Atom scores')
+    # ax.set_xlabel('erreur positive')
+    ax.set_xlabel('positive error')
+    # ax.set_ylabel('erreur négative')
+    ax.set_ylabel('negative error')
 
     other_atoms = [atom_index for atom_index in range(instance.n_atoms()) if not atom_index in LOLH_atoms and not atom_index in PRIDE_atoms]
 
     cmap = plt.get_cmap('viridis')
 
     # plot LOLH atoms
-    ax.scatter([instance.atom_score[ind_atom][0] for ind_atom in LOLH_atoms], [instance.atom_score[ind_atom][1] for ind_atom in LOLH_atoms], marker='X', s=50, linewidth=1, edgecolor='k', color='limegreen', zorder=2, label='atomes LOLH')
+    # ax.scatter([instance.atom_score[ind_atom][0] for ind_atom in LOLH_atoms], [instance.atom_score[ind_atom][1] for ind_atom in LOLH_atoms], marker='X', s=50, linewidth=1, edgecolor='k', color='limegreen', zorder=2, label='atomes LOLH')
+    ax.scatter([instance.atom_score[ind_atom][0] for ind_atom in LOLH_atoms], [instance.atom_score[ind_atom][1] for ind_atom in LOLH_atoms], marker='X', s=50, linewidth=1, edgecolor='k', color='limegreen', zorder=2, label='LOLH atoms')
 
     # plot pride atoms
-    ax.scatter([instance.atom_score[ind_atom][0] for ind_atom in PRIDE_atoms], [instance.atom_score[ind_atom][1] for ind_atom in PRIDE_atoms], marker='X', s=50, linewidth=1, edgecolor='k', color='red', zorder=2, label='atomes PRIDE')
+    # ax.scatter([instance.atom_score[ind_atom][0] for ind_atom in PRIDE_atoms], [instance.atom_score[ind_atom][1] for ind_atom in PRIDE_atoms], marker='X', s=50, linewidth=1, edgecolor='k', color='red', zorder=2, label='atomes PRIDE')
+    ax.scatter([instance.atom_score[ind_atom][0] for ind_atom in PRIDE_atoms], [instance.atom_score[ind_atom][1] for ind_atom in PRIDE_atoms], marker='X', s=50, linewidth=1, edgecolor='k', color='red', zorder=2, label='PRIDE atoms')
 
     # other (not used) atoms
-    ax.scatter([instance.atom_score[ind_atom][0] for ind_atom in other_atoms], [instance.atom_score[ind_atom][1] for ind_atom in other_atoms], alpha=0.5, marker='x', zorder=0, label='autres atomes')
+    # ax.scatter([instance.atom_score[ind_atom][0] for ind_atom in other_atoms], [instance.atom_score[ind_atom][1] for ind_atom in other_atoms], alpha=0.5, marker='x', zorder=0, label='autres atomes')
+    ax.scatter([instance.atom_score[ind_atom][0] for ind_atom in other_atoms], [instance.atom_score[ind_atom][1] for ind_atom in other_atoms], alpha=0.5, marker='x', zorder=0, label='other atoms')
 
     # score = 0.0
     ax.plot([0, instance.n_positives()], [0, instance.n_negatives()], color='black', linestyle='--', label='score = 0.0', lw=1.5, zorder=1)
@@ -208,6 +228,7 @@ def plot_LOLH_PRIDE_histograms(instance, LOLH_rule, PRIDE_rules, PRIDE_rule_scor
     histo = histogram.Histogram(instance, LOLH_rule)
     fig, ax = plt.subplots()
     visualizer.plot_histograms(ax, histo, True)
+    ax.set_title('Histograms of LOLH rule')
 
     # selection of the best PRIDE rule
     PRIDE_indexes_sorted =  list(range(len(PRIDE_rules)))
@@ -229,12 +250,14 @@ def plot_LOLH_PRIDE_histograms(instance, LOLH_rule, PRIDE_rules, PRIDE_rule_scor
 
     fig.tight_layout(w_pad=2)
 
-    # ax.set_title('Histogrammes pour PRIDE')
+    # ax.set_title('Histograms for PRIDE')
     visualizer.plot_histograms(axs[0], histo1, True)
-    axs[0].set_title(r'Plus longue règle PRIDE')
+    # axs[0].set_title(r'Plus longue règle PRIDE')
+    axs[0].set_title(r'Longest PRIDE rule')
 
     visualizer.plot_histograms(axs[1], histo2, True)
-    axs[1].set_title(r'Meilleure règle PRIDE')
+    # axs[1].set_title(r'Meilleure règle PRIDE')
+    axs[1].set_title(r'Best PRIDE rule')
 
     return
 
@@ -268,9 +291,14 @@ def multiobjective_comparison(instance, solver):
     right_score = biobj_score[ind_right]
 
     fig, ax = plt.subplots()
-    # ax.set_title('Score des règles bi-objectives')
-    ax.set_xlabel('erreur positive')
-    ax.set_ylabel('erreur négative')
+
+    # ax.set_title('Score des règles bi-objectif')
+    ax.set_title('Bi-objective rule scores')
+    # ax.set_xlabel('erreur positive')
+    ax.set_xlabel('positive error')
+    # ax.set_ylabel('erreur négative')
+    ax.set_ylabel('negative error')
+
     ind_reduced = [ind for ind in range(len(biobj_score)) if ind != ind_left and ind != ind_right]
     ax.scatter([biobj_score[ind][0] for ind in ind_reduced], [biobj_score[ind][1] for ind in ind_reduced], marker='x', s=25)
     ax.scatter([biobj_score[ind_left][0], biobj_score[ind_right][0]], [biobj_score[ind_left][1], biobj_score[ind_right][1]], color='red', marker='x', s=30)
@@ -290,9 +318,13 @@ def multiobjective_comparison(instance, solver):
 
     fig,axs = plt.subplots(1,2)
     fig.tight_layout(w_pad=3)
-    axs[0].set_title(r'Histogramme de la règle $r_1$')
+    # axs[0].set_title(r'Histogramme de la règle $r_1$')
+    axs[0].set_title(r'$r_1$ rule histograms')
+
     visualizer.plot_histograms(axs[0], histo_left, True)
-    axs[1].set_title(r'Histogramme de la règle $r_2$')
+    # axs[1].set_title(r'Histogramme de la règle $r_2$')
+    axs[1].set_title(r'$r_2$ rule histograms')
+
     visualizer.plot_histograms(axs[1], histo_right, True)
 
     axs[0].set_ylim((0, 1))
@@ -310,9 +342,16 @@ def rule_histograms_comparisons(instance, solver):
     ax.set_ylim([0, instance.n_negatives()])
 
     # ax.set_title('Visualisation de plusieurs règles logiques')
+
+    ax.set_title('visualization of several logic rules')
+
     # ax.plot([0, nPos], [0, nNeg], '--', color='grey', zorder=3, alpha=0.7)
-    ax.set_xlabel('erreur positive')
-    ax.set_ylabel('erreur négative')
+    # ax.set_xlabel('erreur positive')
+    ax.set_xlabel('positive error')
+
+    # ax.set_ylabel('erreur négative')
+    ax.set_ylabel('negative error')
+
 
     ax.set_aspect('equal')
 
@@ -331,12 +370,16 @@ def rule_histograms_comparisons(instance, solver):
     body_worst = atoms_sandwich[:nAtomsSel]
     print('body: ', body_worst)
     # ax.scatter([instance.atom_score[ind_atom][0] for ind_atom in body_worst], [instance.atom_score[ind_atom][1] for ind_atom in body_worst], marker='x', color='#f64c4c', zorder=4)
-    ax.scatter([instance.atom_score[ind_atom][0] for ind_atom in body_worst], [instance.atom_score[ind_atom][1] for ind_atom in body_worst], marker='X', s=50, color='limegreen', linewidth=1, edgecolor='k', zorder=4, label='règle sous-optimale')
+
+    # rule_label = 'règle sous-optimale'
+    rule_label = 'sub optimal rule'
+    ax.scatter([instance.atom_score[ind_atom][0] for ind_atom in body_worst], [instance.atom_score[ind_atom][1] for ind_atom in body_worst], marker='X', s=50, color='limegreen', linewidth=1, edgecolor='k', zorder=4, label=rule_label)
 
 
     # histogramme
     histo = histogram.Histogram(instance, body_worst)
-    axsh[0,0].set_title('Règle sous-optimale')
+    # axsh[0,0].set_title('Règle sous-optimale')
+    axsh[0,0].set_title('Sub optimal rule')
     visualizer.plot_histograms(axsh[0,0], histo, True)
 
 
@@ -362,7 +405,8 @@ def rule_histograms_comparisons(instance, solver):
 
     # histogramme
     histo = histogram.Histogram(instance, body_inverse)
-    axsh[0,1].set_title('Règle inverse')
+    # axsh[0,1].set_title('Règle inverse')
+    axsh[0,1].set_title('Inverse rule')
     visualizer.plot_histograms(axsh[0,1], histo, True)
 
     # ax.fill([A1[0], B1[0], B2[0], A2[0]], [A1[1], B1[1], B2[1], A2[1]], zorder=3, color='orange', alpha=0.3, label='règle inverse')
@@ -385,36 +429,45 @@ def rule_histograms_comparisons(instance, solver):
     print('body: ', body_worst)
     # ax.scatter([instance.atom_score[ind_atom][0] for ind_atom in body_worst], [instance.atom_score[ind_atom][1] for ind_atom in body_worst], marker='x', color='#f64c4c', zorder=4, label='atomes sélectionnés')
 
-    ax.scatter([instance.atom_score[ind_atom][0] for ind_atom in body_worst], [instance.atom_score[ind_atom][1] for ind_atom in body_worst], marker='X', s=50, color='red', linewidth=1, edgecolor='k', zorder=4, label='règle inappropriée')
+    # rule_label = 'règle inappropriée'
+    rule_label = 'inapropriate rule'
+
+    ax.scatter([instance.atom_score[ind_atom][0] for ind_atom in body_worst], [instance.atom_score[ind_atom][1] for ind_atom in body_worst], marker='X', s=50, color='red', linewidth=1, edgecolor='k', zorder=4, label=rule_label)
 
     # histogramme
     histo = histogram.Histogram(instance, body_worst)
-    axsh[1,0].set_title('Règle inappropriée')
+    # axsh[1,0].set_title('Règle inappropriée')
+    axsh[1,0].set_title('Inapropriate rule')
+
     visualizer.plot_histograms(axsh[1,0], histo, True)
 
     # ax.fill([A1[0], B1[0], B2[0], A2[0]], [A1[1], B1[1], B2[1], A2[1]], zorder=3, color='red', alpha=0.3, label='règle inappropriée')
     # ax.plot([A1[0], B1[0]], [A1[1], B1[1]], '--', color='k', zorder=3)
     # ax.plot([A2[0], B2[0]], [A2[1], B2[1]], '--', color='k', zorder=3)
 
+    # rule_label = 'règle inverse'
+    rule_label = 'inverse rule'
 
-
-
-    ax.scatter([instance.atom_score[ind_atom][0] for ind_atom in body_inverse], [instance.atom_score[ind_atom][1] for ind_atom in body_inverse], marker='X', s=50, color='darkorchid', linewidth=1, edgecolor='k', zorder=4, label='règle inverse')
-
+    ax.scatter([instance.atom_score[ind_atom][0] for ind_atom in body_inverse], [instance.atom_score[ind_atom][1] for ind_atom in body_inverse], marker='X', s=50, color='darkorchid', linewidth=1, edgecolor='k', zorder=4, label=rule_label)
 
 
     atomes = [ind for ind in range(instance.n_atoms())]
     np.random.shuffle(atomes)
     body_random = atomes[:10]
     histo = histogram.Histogram(instance, body_random)
-    axsh[1,1].set_title('Règle aléatoire')
+    # axsh[1,1].set_title('Règle aléatoire')
+    axsh[1,1].set_title('Random rule')
+
     visualizer.plot_histograms(axsh[1,1], histo, True)
 
-    ax.scatter([instance.atom_score[ind_atom][0] for ind_atom in body_random], [instance.atom_score[ind_atom][1] for ind_atom in body_random], marker='X', color='orange', linewidth=1, edgecolor='k', zorder=4, label='règle aléatoire', s=50)
+    # rule_label = 'règle aléatoire'
+    rule_label = 'random rule'
 
+    ax.scatter([instance.atom_score[ind_atom][0] for ind_atom in body_random], [instance.atom_score[ind_atom][1] for ind_atom in body_random], marker='X', color='orange', linewidth=1, edgecolor='k', zorder=4, label=rule_label, s=50)
 
-
-    ax.scatter([instance.atom_score[ind][0] for ind in range(instance.n_atoms())], [instance.atom_score[ind][1] for ind in range(instance.n_atoms())], marker='x', zorder=1, alpha=0.5, label='autres atomes')
+    # atom_labels = 'autres atomes'
+    atom_labels = 'other atoms'
+    ax.scatter([instance.atom_score[ind][0] for ind in range(instance.n_atoms())], [instance.atom_score[ind][1] for ind in range(instance.n_atoms())], marker='x', zorder=1, alpha=0.5, label=atom_labels)
 
 
 
@@ -782,4 +835,4 @@ def evaluate(filename):
 
     return
 
-evaluate('../../dataset/artificial/artificial_matrix.csv')
+# evaluate('../../dataset/artificial/artificial_matrix.csv')

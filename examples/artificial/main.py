@@ -16,7 +16,7 @@ nVariables = 10000
 nPositives = 1000
 nNegatives = 1000
 
-# generator.generate_dataset(nVariables, nPositives, nNegatives, filename)
+generator.generate_dataset(nVariables, nPositives, nNegatives, filename)
 
 
 ########################################################
