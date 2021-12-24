@@ -18,24 +18,20 @@ Part of the analysis associated to the selection of cells in the demo relies on 
 
 ## Examples
 
-### artificial dataset:
+### Artificial dataset
 
-Randomly generated LOLH instances.
-
-In this example, an artificial dataset is randomly generated, by imitating the distribution of single-cell data. This dataset is used to compare several implementations for logical inference and classification. The complete example can be executed from the script 'main.py'.
+In this example, an artificial dataset is randomly generated, by imitating the distribution of single-cell data. This dataset is used to compare several implementations for logical inference and classification. The complete example can be executed from the script `main.py`.
 
 
-### Imagine dataset:
+### Imagine dataset
 
-In this example, several analysis are performed on a single-cell dataset.
-This dataset is a pbmc matrix obtained by Imagine institute (https://www.institutimagine.org/fr).
-The dataset is available from http://doi.org/10.5281/zenodo.4730807.
+In this example, several analysis are performed on a single-cell dataset. This dataset is a pbmc matrix obtained by [Imagine institute](https://www.institutimagine.org/fr). The dataset is available at http://doi.org/10.5281/zenodo.4730807. The script `init.sh` allows to automatically download the dataset and to perform its discretization.
 
-#### Coexpression analysis
+* Coexpression analysis:
 
-The analysis of coexpression consists in computing discrete correlations between the genes across the dataset.
+The analysis of coexpression consists in computing discrete correlations between the genes across the dataset. This analysis can be performed with the script `coexpression_main.py`
 
-#### Dynamical analysis
+* Dynamical analysis:
 
 ## Acknowledgment:
 
