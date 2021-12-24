@@ -51,7 +51,7 @@ def plot_cell_types():
     ax.scatter(umap_coordinates['UMAP_1'][:], umap_coordinates['UMAP_2'][:], s=1, c = [cell_color[df_cell_types['Label'][cell]] for cell in umap_coordinates.index])
     ax.set_xlabel('UMAP 1')
     ax.set_ylabel('UMAP 2')
-    # ax.set_title('Visualization of the cell types')
+    ax.set_title('UMAP visualization of the cell types')
 
     # print the cell types
     celltypes_index = 0
@@ -128,7 +128,7 @@ def plot_cell_macrotypes():
     ax.scatter(umap_coordinates['UMAP_1'].values, umap_coordinates['UMAP_2'].values, c=col, s=1)
     ax.set_xlabel('UMAP 1')
     ax.set_ylabel('UMAP 2')
-    # ax.set_title('UMAP visualization of the macro cell types')
+    ax.set_title('UMAP visualization of the cell macro types')
     for celltype in colors_dic: # print the macro types
         if celltype != 'nan':
             if celltype == 'T':

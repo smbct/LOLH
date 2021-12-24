@@ -68,9 +68,14 @@ def NK_classification():
 
     other_atoms_indexes = [atom_index for atom_index in range(instance.n_atoms()) if not atom_index in LOLH_rule]
 
-    ax.scatter([instance.atom_score[atom_index][0] for atom_index in LOLH_rule], [instance.atom_score[atom_index][1] for atom_index in LOLH_rule], marker='x', color='red', label='atomes sélectionnés', zorder=2)
+    # ax.scatter([instance.atom_score[atom_index][0] for atom_index in LOLH_rule], [instance.atom_score[atom_index][1] for atom_index in LOLH_rule], marker='x', color='red', label='atomes sélectionnés', zorder=2)
 
-    ax.scatter([instance.atom_score[atom_index][0] for atom_index in other_atoms_indexes], [instance.atom_score[atom_index][1] for atom_index in other_atoms_indexes], marker='x', zorder=1, label='autres atomes', alpha=0.7)
+    ax.scatter([instance.atom_score[atom_index][0] for atom_index in LOLH_rule], [instance.atom_score[atom_index][1] for atom_index in LOLH_rule], marker='x', color='red', label='selected atoms', zorder=2)
+
+
+    ax.scatter([instance.atom_score[atom_index][0] for atom_index in other_atoms_indexes], [instance.atom_score[atom_index][1] for atom_index in other_atoms_indexes], marker='x', zorder=1, label='other atoms', alpha=0.7)
+
+    # ax.scatter([instance.atom_score[atom_index][0] for atom_index in other_atoms_indexes], [instance.atom_score[atom_index][1] for atom_index in other_atoms_indexes], marker='x', zorder=1, label='autres atomes', alpha=0.7)
 
     # equation score = 0
     ax.plot([0, instance.n_positives()], [0, instance.n_negatives()], color='black', label='score=0.0', zorder=3)
@@ -84,9 +89,12 @@ def NK_classification():
 
     ax.set_xlim((0, instance.n_positives()))
     ax.set_ylim((0, instance.n_negatives()))
-    ax.set_xlabel('erreur positive')
-    ax.set_ylabel('erreur négative')
-    # ax.set_title('atoms positive and negative scores')
+    # ax.set_xlabel('erreur positive')
+    ax.set_xlabel('positive error')
+    # ax.set_ylabel('erreur négative')
+    ax.set_ylabel('negative error')
+
+    ax.set_title('Atom errors for the classification of the NK cells by LOLH')
 
     ax.legend(loc='lower right')
 
@@ -100,6 +108,7 @@ def NK_classification():
     fig,ax = plt.subplots()
     histograms = histogram.Histogram(instance, LOLH_rule)
     visualizer.plot_histograms(ax, histograms, True)
+    ax.set_title('Histograms of the matching error for the classification of NK cells')
     ax.set_ylim((0, 0.3))
 
 
@@ -124,8 +133,10 @@ def NK_classification():
     ax.set_ylabel('UMAP 2')
     ax.set_aspect( (ax.get_xlim()[1]-ax.get_xlim()[0]) / (ax.get_ylim()[1]-ax.get_ylim()[0])  )
 
+    ax.set_title('Matching error of the cells with LOLH rule (NK classification)')
+
     cbar = ax.get_figure().colorbar(cm.ScalarMappable(norm=cnorm, cmap=plasma), ax=ax)
-    cbar.set_label('Erreur de couverture')
+    cbar.set_label('Matching error')
 
     umap_limits = (ax.get_xlim(), ax.get_ylim())
 
@@ -135,22 +146,22 @@ def NK_classification():
 
     ################################################################################
     # selection of the cells that are not NK, with a matching error <= 15
-    negative_cells_selected = [elt for error in range(16) for elt in histograms.negative_histogram[error]]
-    negative_cells_selected.reverse()
-
-    other_cells = [index for index in umap_coordinates.index if not index in negative_cells_selected and df_cell_types['Label'][index] != 'NK']
-
-    cnorm = mcolors.Normalize(vmin=0, vmax=15)
-
-    fig,ax = plt.subplots()
-    ax.set_xlabel('UMAP 1')
-    ax.set_ylabel('UMAP 2')
-    ax.scatter(umap_coordinates.loc[other_cells]['UMAP_1'][:], umap_coordinates.loc[other_cells]['UMAP_2'][:], c='grey', s=2, alpha=0.2)
-    ax.scatter(umap_coordinates.loc[negative_cells_selected]['UMAP_1'][:], umap_coordinates.loc[negative_cells_selected]['UMAP_2'][:], c=[cell_scores[cell] for cell in negative_cells_selected], s=2, norm=cnorm, cmap=plasma)
-    ax.set_xlim(umap_limits[0])
-    ax.set_ylim(umap_limits[1])
-    cbar = ax.get_figure().colorbar(cm.ScalarMappable(norm=cnorm, cmap=plasma), ax=ax)
-    cbar.set_label('Erreur de couverture')
+    # negative_cells_selected = [elt for error in range(16) for elt in histograms.negative_histogram[error]]
+    # negative_cells_selected.reverse()
+    #
+    # other_cells = [index for index in umap_coordinates.index if not index in negative_cells_selected and df_cell_types['Label'][index] != 'NK']
+    #
+    # cnorm = mcolors.Normalize(vmin=0, vmax=15)
+    #
+    # fig,ax = plt.subplots()
+    # ax.set_xlabel('UMAP 1')
+    # ax.set_ylabel('UMAP 2')
+    # ax.scatter(umap_coordinates.loc[other_cells]['UMAP_1'][:], umap_coordinates.loc[other_cells]['UMAP_2'][:], c='grey', s=2, alpha=0.2)
+    # ax.scatter(umap_coordinates.loc[negative_cells_selected]['UMAP_1'][:], umap_coordinates.loc[negative_cells_selected]['UMAP_2'][:], c=[cell_scores[cell] for cell in negative_cells_selected], s=2, norm=cnorm, cmap=plasma)
+    # ax.set_xlim(umap_limits[0])
+    # ax.set_ylim(umap_limits[1])
+    # cbar = ax.get_figure().colorbar(cm.ScalarMappable(norm=cnorm, cmap=plasma), ax=ax)
+    # cbar.set_label('Erreur de couverture')
 
 
 
@@ -158,27 +169,27 @@ def NK_classification():
 
     ################################################################################
     # list all the sub-rules with a null matching error (perfect match)
-    print('list of all the sub rules with perfect match:\n')
-    sub_df = df.loc[:,[instance.get_atom(atom_index)[0] for atom_index in LOLH_rule]]
-    sub_rules = []
-    for pos_sample in instance._pos_samples:
-        sub_rule = []
-        for atom_index in LOLH_rule:
-            atom = instance.get_atom(atom_index)
-            if sub_df[atom[0]][pos_sample] == atom[1]:
-                sub_rule.append(atom_index)
-        sub_rules.append(sub_rule)
-        # print(pos_sample, ': ', [instance.get_atom(atom_index) for atom_index in sub_body])
-
-    unique_sub, counts = np.unique(np.asarray(sub_rules), return_counts=True)
-    res = list(zip(counts, unique_sub))
-    res.sort(key=lambda elt:elt[0], reverse=True)
-    for elt in res:
-        print(elt)
-        print('\n')
+    # print('list of all the sub rules with perfect match:\n')
+    # sub_df = df.loc[:,[instance.get_atom(atom_index)[0] for atom_index in LOLH_rule]]
+    # sub_rules = []
+    # for pos_sample in instance._pos_samples:
+    #     sub_rule = []
+    #     for atom_index in LOLH_rule:
+    #         atom = instance.get_atom(atom_index)
+    #         if sub_df[atom[0]][pos_sample] == atom[1]:
+    #             sub_rule.append(atom_index)
+    #     sub_rules.append(sub_rule)
+    #     # print(pos_sample, ': ', [instance.get_atom(atom_index) for atom_index in sub_body])
+    #
+    # unique_sub, counts = np.unique(np.asarray(sub_rules), return_counts=True)
+    # res = list(zip(counts, unique_sub))
+    # res.sort(key=lambda elt:elt[0], reverse=True)
+    # for elt in res:
+    #     print(elt)
+    #     print('\n')
 
 
 
     plt.show()
 
-NK_classification()
+# NK_classification()
