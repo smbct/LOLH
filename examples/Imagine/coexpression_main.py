@@ -23,9 +23,9 @@ import coexpression_analysis
 np.random.seed(42)
 random.seed(42)
 
-print('**********************************************************************************************************************')
-print('    Coexpression analysis of the pbmc dataset from Imagine institute through inductive logic programming with LOLH    ')
-print('**********************************************************************************************************************')
+print('**********************************************************************************')
+print('    Coexpression analysis of the pbmc dataset from Imagine institute with LOLH    ')
+print('**********************************************************************************')
 
 filename = '../../dataset/Imagine/normalized_matrix.csv'
 filename_discrete = '../../dataset/discrete_matrix.csv'
