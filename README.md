@@ -22,18 +22,27 @@ Part of the analysis associated to the selection of cells in the demo relies on 
 
 Randomly generated LOLH instances.
 
+In this example, an artificial dataset is randomly generated, by imitating the distribution of single-cell data. This dataset is used to compare several implementations for logical inference and classification. The complete example can be executed from the script 'main.py'.
+
+
 ### Imagine dataset:
 
-A pbmc matrix obtained by Imagine institute (https://www.institutimagine.org/fr)
+In this example, several analysis are performed on a single-cell dataset.
+This dataset is a pbmc matrix obtained by Imagine institute (https://www.institutimagine.org/fr).
+The dataset is available from http://doi.org/10.5281/zenodo.4730807.
 
--> http://doi.org/10.5281/zenodo.4730807
+#### Coexpression analysis
+
+The analysis of coexpression consists in computing discrete correlations between the genes across the dataset.
+
+#### Dynamical analysis
 
 ## Acknowledgment:
 
 ## References:
 
-Samuel Buchet, Francesco Carbone, Morgan Magnin, Mickaël Ménager, and Olivier Roux. 2021. Inference of Gene Networks from Single Cell Data through Quantified Inductive Logic Programming. In The 12th International Conference on Computational Systems-Biology and Bioinformatics (CSBio2021). Association for Computing Machinery, New York, NY, USA, 48–63. DOI:https://doi.org/10.1145/3486713.3486746
+* Samuel Buchet, Francesco Carbone, Morgan Magnin, Mickaël Ménager, and Olivier Roux. 2021. Inference of Gene Networks from Single Cell Data through Quantified Inductive Logic Programming. In The 12th International Conference on Computational Systems-Biology and Bioinformatics (CSBio2021). Association for Computing Machinery, New York, NY, USA, 48–63. DOI:https://doi.org/10.1145/3486713.3486746
 
-Ribeiro T., Folschette M., Magnin M., Roux O., Inoue K. (2018) Learning Dynamics with Synchronous, Asynchronous and General Semantics. In: Riguzzi F., Bellodi E., Zese R. (eds) Inductive Logic Programming. ILP 2018. Lecture Notes in Computer Science, vol 11105. Springer, Cham. https://doi.org/10.1007/978-3-319-99960-9_8
+* Ribeiro T., Folschette M., Magnin M., Roux O., Inoue K. (2018) Learning Dynamics with Synchronous, Asynchronous and General Semantics. In: Riguzzi F., Bellodi E., Zese R. (eds) Inductive Logic Programming. ILP 2018. Lecture Notes in Computer Science, vol 11105. Springer, Cham. https://doi.org/10.1007/978-3-319-99960-9_8
 
-Tony Ribeiro, Maxime Folschette, Morgan Magnin, Katsumi Inoue. Polynomial Algorithm For Learning From Interpretation Transition. 1st International Joint Conference on Learning & Reasoning, Oct 2021, (virtual), Greece. ⟨hal-03347026⟩
+* Tony Ribeiro, Maxime Folschette, Morgan Magnin, Katsumi Inoue. Polynomial Algorithm For Learning From Interpretation Transition. 1st International Joint Conference on Learning & Reasoning, Oct 2021, (virtual), Greece. ⟨hal-03347026⟩
