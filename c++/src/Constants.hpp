@@ -23,7 +23,7 @@
 #define SAMPLE_SIZE 0.1
 
 /* set to 1 to use multiple cores */
-#define USE_OPENMP 1
+#define USE_OPENMP 0
 
 /* number of processors to use */
 #if USE_OPENMP == 1

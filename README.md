@@ -29,7 +29,7 @@ In this example, several analysis are performed on a single-cell dataset. This d
 
 * Coexpression analysis:
 
-The analysis of coexpression consists in computing discrete correlations between the genes across the dataset. This analysis can be performed with the script `coexpression_main.py`
+The analysis of coexpression consists in computing discrete correlations between the genes across the dataset. This analysis can be performed with the script `coexpression_main.py`. Differential expression can also be performed with Seurat, by using the command `Rscript DE_testing.R` to validate the identity of then gene clusters.
 
 * Dynamical analysis:
 
