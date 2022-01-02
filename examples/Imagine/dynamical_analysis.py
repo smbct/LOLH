@@ -226,28 +226,28 @@ def global_analysis():
     # load the discrete dataset
     filename = '../../dataset/Imagine/discrete_matrix.csv'
     df_discrete = pd.read_csv(filename, index_col = 0)
-    print(df_discrete.head())
+    # print(df_discrete.head())
 
     # load the cell types
     filename = '../../dataset/Imagine/cell_types.csv'
     df_celltypes = pd.read_csv(filename, index_col = 0)
-    print(df_celltypes.head())
+    # print(df_celltypes.head())
 
     # load the cell macro types
     filename = '../../dataset/Imagine/cell_types_macro.csv'
     df_cell_macrotypes = pd.read_csv(filename, index_col = 0)
-    print(df_cell_macrotypes.head())
+    # print(df_cell_macrotypes.head())
 
     # load the UMAP representation
     filename = '../../dataset/Imagine/umap_coordinates.csv'
     df_umap = pd.read_csv(filename, index_col = 0)
-    print(df_umap.head())
+    # print(df_umap.head())
 
     # load the normalized dataset
     filename = '../../dataset/Imagine/normalized_matrix.csv'
     df_normalized = pd.read_csv(filename, index_col = 0)
     df_normalized = df_normalized.T
-    print(df_normalized.head())
+    # print(df_normalized.head())
 
     # display the regulatory graph
     print('display the (directed) graph')
@@ -283,8 +283,23 @@ def global_analysis():
     # # cograph.compute_positions()
     # # cograph.save(output_file)
     #
-    # cograph = Graph('coexpression network')
-    # cograph.load_from_file('../../dataset/Imagine/coexpression/coexpression_graph.txt')
+    cograph = Graph('coexpression network')
+    cograph.load_from_file('../../dataset/Imagine/coexpression/coexpression_graph.txt')
+
+    # display the coexpression graph
+    print('display the coexpression graph')
+    col_option = 'clustering_colors'
+    fig, ax = plt.subplots()
+    cograph.plot(ax, col_option, False, 10)
+    ax.set_title('Coexpression graph')
+
+    print('number of clusters in the dynamical graph initially: ', len(cograph.clusters))
+    coexpression_clusters = {}
+    for cluster in cograph.clusters:
+        if len(cograph.clusters[cluster]) >= 20:
+            coexpression_clusters[cluster] = cograph.clusters[cluster]
+    # print(coexpression_clusters)
+
     # fig, ax = plt.subplots()
     # ax.set_title('Coexpression graph')
     # cograph.plot(ax, 'clustering_colors', False, 10)
@@ -350,17 +365,18 @@ def global_analysis():
 
     # ########################################################################""
 
-    print('plot the clusters')
+    print('plot the dynamical clusters')
     # create a fake instance
     instance = Instance.create_random_instance(df_discrete.copy(deep=False), 0.5)
     # cluster_index = list(clusters.keys())[0]
 
     selected_clusters = [6,7,8,9,11,20]
-    selected_clusters = [cl for cl in clusters]
+    # selected_clusters = [cl for cl in clusters]
 
     ncol = 2
     nrows = int(len(selected_clusters)/float(ncol))
-    fix, axs = plt.subplots(nrows, ncol)
+    fig, axs = plt.subplots(nrows, ncol)
+    fig.suptitle('dynamical clusters matching error')
     axs = axs.flat
     ind_plot = 0
     for cluster_index in selected_clusters:
@@ -373,6 +389,30 @@ def global_analysis():
 
     # ########################################################################""
 
+
+    # ########################################################################""
+
+    print('plot the coexpression clusters')
+    # create a fake instance
+    instance = Instance.create_random_instance(df_discrete.copy(deep=False), 0.5)
+
+    selected_clusters = [cl for cl in coexpression_clusters]
+
+    ncol = 2
+    nrows = int(len(selected_clusters)/float(ncol))
+    fig, axs = plt.subplots(nrows, ncol)
+    fig.suptitle('coexpression clusters matching error')
+    axs = axs.flat
+    ind_plot = 0
+    for cluster_index in selected_clusters:
+        ax = axs[ind_plot]
+        body =  [ instance.get_atom_index(cograph.atoms[index]) for index in coexpression_clusters[ cluster_index ] ]
+        # fig, ax = plt.subplots()
+        ax.set_title('cluster ' + str(cluster_index))
+        plot_cluster_umap(df_discrete, df_umap, instance, body, ax)
+        ind_plot += 1
+
+    # ########################################################################""
 
 
 
@@ -407,7 +447,7 @@ def global_analysis():
     selected_cells = []
     for i in range(190):
         selected_cells += histo.positive_histogram[i]
-    print(selected_cells)
+    # print(selected_cells)
 
     T_cells = list(df_cell_macrotypes.loc[df_cell_macrotypes['cellType_macro'] == 'T'].index)
 
@@ -417,8 +457,8 @@ def global_analysis():
     other_cells = [cell for cell in T_cells if not cell in selected_cells]
 
     df_selected_cells = pd.DataFrame([1]*len(selected_cells)+[0]*len(other_cells), index = selected_cells+other_cells, columns=['X'])
-    print(df_selected_cells)
-    print(selected_cells+other_cells)
+    # print(df_selected_cells)
+    # print(selected_cells+other_cells)
     df_selected_cells.to_csv('selected_cells_dynamics_c20.csv')
 
     fig,ax = plt.subplots()
@@ -470,8 +510,13 @@ def global_analysis():
         df_connecting_edges = pd.DataFrame(connecting_edges, columns=['left gene', 'left value', 'left cluster', 'right gene', 'right value', 'right cluster'])
         df_connecting_edges.to_csv('dynmical_connecting_edges.csv')
 
+    ###############################################
+    # compare dynamical clusters between themselves
+    ###############################################
+
     paired_clusters = [(0,6), (1,7), (2,8), (3,9), (4,11), (20,23)]
 
+    print('Shared genes between the dynamical clusters:\n')
     for elt in paired_clusters:
         ind_1 = elt[0]
         ind_2 = elt[1]
@@ -480,11 +525,51 @@ def global_analysis():
         shared = [elt for elt in genes_c1 if elt in genes_c2]
         print('between cluster ', ind_1, '(', len(genes_c1), ') and ', ind_2, '(', len(genes_c2), ') genes: ', len(shared), ' genes are shared')
 
-    # compare clusters
-    # for ind_1 in clusters:
-        # for ind_2 in clusters:
-            # if ind_1 < ind_2:
+    ###############################################
+    # compare dynamical and coexpression clusters
+    ###############################################
 
+
+    # compute number of atoms shared between a dynamical and a coexpression cluster
+    print('\n\nShared atoms between the dynamical and the coexpression clusters:\n')
+    matching_clusters = {}
+    for cluster in clusters:
+        list_matched = []
+        for coexpression_cluster in coexpression_clusters:
+            atoms_c1 = [graph.atoms[index] for index in clusters[cluster]]
+            atoms_c2 = [cograph.atoms[index] for index in coexpression_clusters[coexpression_cluster]]
+            shared = [elt for elt in atoms_c1 if elt in atoms_c2]
+            if float(len(shared))/len(atoms_c1) >= 0.1 or float(len(shared))/len(atoms_c2) >= 0.1:
+                print('between dynamical cluster ', cluster, '(', len(atoms_c1), ' atoms) and coexpression cluster', coexpression_cluster, '(', len(atoms_c2), ' atoms) : ', len(shared), ' atoms are shared')
+                list_matched.append(coexpression_cluster)
+
+        if len(list_matched) > 0:
+            matching_clusters[cluster] = list_matched
+
+    # plot the matched clusters (dynamical and coexpression)
+    for dynamical_index in matching_clusters:
+
+        fig, axs = plt.subplots(1, len(matching_clusters[dynamical_index])+1)
+
+        body =  [ instance.get_atom_index(graph.atoms[index]) for index in clusters[dynamical_index] ]
+        plot_cluster_umap(df_discrete, df_umap, instance, body, axs[0])
+        axs[0].set_title('dynamical cluster ' + str(dynamical_index))
+
+        for ind in range(len(matching_clusters[dynamical_index])):
+            body =  [ instance.get_atom_index(cograph.atoms[index]) for index in coexpression_clusters[matching_clusters[dynamical_index][ind]] ]
+            plot_cluster_umap(df_discrete, df_umap, instance, body, axs[ind+1])
+            axs[ind+1].set_title('coexpression cluster ' + str(matching_clusters[dynamical_index][ind]))
+
+    # # plot the atoms that are not associated to coexpression clusters
+    # cl = [8,11,20]
+    # atoms = []
+    # for index in cl:
+    #     atoms += [graph.atoms[atom_ind] for atom_ind in clusters[index]]
+    # print(atoms)
+    # file = open('atoms_unshared.txt', 'w')
+    # for atom in atoms:
+    #     file.write(atom[0] + ' ' + str(atom[1]) + '\n')
+    # file.close()
 
     plt.show()
 
