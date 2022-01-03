@@ -114,7 +114,7 @@ def plot_cluster_umap(df_discrete, df_coordinates, instance, body, ax):
     df_coordinates_sorted = df_coordinates.loc[barcodes]
 
     col = [cell_score[barcode] for barcode in df_coordinates_sorted.index]
-    ax.scatter(df_coordinates_sorted['UMAP_1'].values, df_coordinates_sorted['UMAP_2'].values, c=col, cmap=plasma, norm=cnorm, s=3)
+    ax.scatter(df_coordinates_sorted['UMAP_1'].values, df_coordinates_sorted['UMAP_2'].values, c=col, cmap=plasma, norm=cnorm, s=1)
 
     # remove UMAP coordinates
     ax.xaxis.set_major_locator(ticker.NullLocator())
@@ -249,19 +249,27 @@ def global_analysis():
     df_normalized = df_normalized.T
     # print(df_normalized.head())
 
+    fig_comp_graph, axs_comp_graph = plt.subplots(1,2)
+
+
     # display the regulatory graph
     print('display the (directed) graph')
-    col_option = '01_colors'
+    # col_option = '01_colors'
+    col_option = 'clustering_colors'
     arrows = True
     cluster_size_limit = 20
-    fig, ax = plt.subplots()
-    graph.plot(ax, col_option, arrows, cluster_size_limit)
-    ax.set_title('Dynamical graph')
+    # fig, ax = plt.subplots()
+    # graph.plot(ax, col_option, arrows, cluster_size_limit)
+    # ax.set_title('Dynamical graph')
+    graph.plot(axs_comp_graph[0], col_option, arrows, cluster_size_limit)
+    axs_comp_graph[0].set_title('Graphe dynamique')
+    axs_comp_graph[0].set_xlabel('FA 1')
+    axs_comp_graph[0].set_ylabel('FA 2')
 
-    col_option = 'clustering_colors'
-    fig, ax = plt.subplots()
-    graph.plot(ax, col_option, arrows, cluster_size_limit)
-    ax.set_title('Dynamical graph')
+    # col_option = 'clustering_colors'
+    # fig, ax = plt.subplots()
+    # graph.plot(ax, col_option, arrows, cluster_size_limit)
+    # ax.set_title('Dynamical graph')
 
 
 
@@ -289,9 +297,13 @@ def global_analysis():
     # display the coexpression graph
     print('display the coexpression graph')
     col_option = 'clustering_colors'
-    fig, ax = plt.subplots()
-    cograph.plot(ax, col_option, False, 10)
-    ax.set_title('Coexpression graph')
+    # fig, ax = plt.subplots()
+    # cograph.plot(ax, col_option, False, 10)
+    # ax.set_title('Coexpression graph')
+    axs_comp_graph[1].set_title('Graphe de co-expression')
+    axs_comp_graph[1].set_xlabel('FA 1')
+    axs_comp_graph[1].set_ylabel('FA 2')
+    cograph.plot(axs_comp_graph[1], col_option, False, 10)
 
     print('number of clusters in the dynamical graph initially: ', len(cograph.clusters))
     coexpression_clusters = {}
@@ -356,14 +368,14 @@ def global_analysis():
     #     plot_cluster_umap(df_discrete, df_umap, instance, body, ax)
     #     ind_plot += 1
     #
-    # ########################################################################""
+    # ##########################################################################
 
 
 
 
 
 
-    # ########################################################################""
+    # ##########################################################################
 
     print('plot the dynamical clusters')
     # create a fake instance
@@ -376,7 +388,7 @@ def global_analysis():
     ncol = 2
     nrows = int(len(selected_clusters)/float(ncol))
     fig, axs = plt.subplots(nrows, ncol)
-    fig.suptitle('dynamical clusters matching error')
+    # fig.suptitle('dynamical clusters matching error')
     axs = axs.flat
     ind_plot = 0
     for cluster_index in selected_clusters:
@@ -387,10 +399,10 @@ def global_analysis():
         plot_cluster_umap(df_discrete, df_umap, instance, body, ax)
         ind_plot += 1
 
-    # ########################################################################""
+    # ##########################################################################
 
 
-    # ########################################################################""
+    # ##########################################################################
 
     print('plot the coexpression clusters')
     # create a fake instance
@@ -412,7 +424,7 @@ def global_analysis():
         plot_cluster_umap(df_discrete, df_umap, instance, body, ax)
         ind_plot += 1
 
-    # ########################################################################""
+    # ##########################################################################
 
 
 
