@@ -249,7 +249,7 @@ def global_analysis():
     df_normalized = df_normalized.T
     # print(df_normalized.head())
 
-    fig_comp_graph, axs_comp_graph = plt.subplots(1,2)
+    # fig_comp_graph, axs_comp_graph = plt.subplots(1,2)
 
 
     # display the regulatory graph
@@ -258,13 +258,14 @@ def global_analysis():
     col_option = 'clustering_colors'
     arrows = True
     cluster_size_limit = 20
-    # fig, ax = plt.subplots()
+    fig, ax = plt.subplots()
     # graph.plot(ax, col_option, arrows, cluster_size_limit)
     # ax.set_title('Dynamical graph')
-    graph.plot(axs_comp_graph[0], col_option, arrows, cluster_size_limit)
-    axs_comp_graph[0].set_title('Graphe dynamique')
-    axs_comp_graph[0].set_xlabel('FA 1')
-    axs_comp_graph[0].set_ylabel('FA 2')
+    graph.plot(ax, col_option, arrows, cluster_size_limit, [6,7,8,9,11,20])
+    # ax.set_title('Graphe dynamique')
+    ax.set_aspect((ax.get_xlim()[1]-ax.get_xlim()[0])/(ax.get_ylim()[1]-ax.get_ylim()[0]))
+    ax.set_xlabel('FA 1')
+    ax.set_ylabel('FA 2')
 
     # col_option = 'clustering_colors'
     # fig, ax = plt.subplots()
@@ -297,13 +298,14 @@ def global_analysis():
     # display the coexpression graph
     print('display the coexpression graph')
     col_option = 'clustering_colors'
-    # fig, ax = plt.subplots()
+    fig, ax = plt.subplots()
     # cograph.plot(ax, col_option, False, 10)
     # ax.set_title('Coexpression graph')
-    axs_comp_graph[1].set_title('Graphe de co-expression')
-    axs_comp_graph[1].set_xlabel('FA 1')
-    axs_comp_graph[1].set_ylabel('FA 2')
-    cograph.plot(axs_comp_graph[1], col_option, False, 10)
+    # ax.set_title('Graphe de co-expression')
+    cograph.plot(ax, col_option, False, 10, [1,2,5], 'upper right')
+    ax.set_aspect((ax.get_xlim()[1]-ax.get_xlim()[0])/(ax.get_ylim()[1]-ax.get_ylim()[0]))
+    ax.set_xlabel('FA 1')
+    ax.set_ylabel('FA 2')
 
     print('number of clusters in the dynamical graph initially: ', len(cograph.clusters))
     coexpression_clusters = {}
@@ -558,19 +560,19 @@ def global_analysis():
         if len(list_matched) > 0:
             matching_clusters[cluster] = list_matched
 
-    # plot the matched clusters (dynamical and coexpression)
-    for dynamical_index in matching_clusters:
-
-        fig, axs = plt.subplots(1, len(matching_clusters[dynamical_index])+1)
-
-        body =  [ instance.get_atom_index(graph.atoms[index]) for index in clusters[dynamical_index] ]
-        plot_cluster_umap(df_discrete, df_umap, instance, body, axs[0])
-        axs[0].set_title('dynamical cluster ' + str(dynamical_index))
-
-        for ind in range(len(matching_clusters[dynamical_index])):
-            body =  [ instance.get_atom_index(cograph.atoms[index]) for index in coexpression_clusters[matching_clusters[dynamical_index][ind]] ]
-            plot_cluster_umap(df_discrete, df_umap, instance, body, axs[ind+1])
-            axs[ind+1].set_title('coexpression cluster ' + str(matching_clusters[dynamical_index][ind]))
+    # # plot the matched clusters (dynamical and coexpression)
+    # for dynamical_index in matching_clusters:
+    #
+    #     fig, axs = plt.subplots(1, len(matching_clusters[dynamical_index])+1)
+    #
+    #     body =  [ instance.get_atom_index(graph.atoms[index]) for index in clusters[dynamical_index] ]
+    #     plot_cluster_umap(df_discrete, df_umap, instance, body, axs[0])
+    #     axs[0].set_title('dynamical cluster ' + str(dynamical_index))
+    #
+    #     for ind in range(len(matching_clusters[dynamical_index])):
+    #         body =  [ instance.get_atom_index(cograph.atoms[index]) for index in coexpression_clusters[matching_clusters[dynamical_index][ind]] ]
+    #         plot_cluster_umap(df_discrete, df_umap, instance, body, axs[ind+1])
+    #         axs[ind+1].set_title('coexpression cluster ' + str(matching_clusters[dynamical_index][ind]))
 
     # # plot the atoms that are not associated to coexpression clusters
     # cl = [8,11,20]
@@ -582,6 +584,65 @@ def global_analysis():
     # for atom in atoms:
     #     file.write(atom[0] + ' ' + str(atom[1]) + '\n')
     # file.close()
+
+    # ###############################################
+    # # load the old coexpression clusters
+    # ###############################################
+
+    # # filename = 'global_clusters_old_1.txt'
+    # filename = 'global_clusters_old_2.txt'
+    # file = open(filename, 'r')
+    # content = file.read().splitlines()
+    # file.close()
+
+    # old_clusters_2 = []
+    # for line in content:
+    #     tokens = line.split(', ')
+    #     atoms_ = []
+    #     for elts in tokens:
+    #         elt = elts.split('_')
+    #         atoms_.append((elt[0], int(elt[1])))
+    #     old_clusters_2.append(atoms_)
+    # print(old_clusters_2)
+
+    # instance = Instance.create_random_instance(df_discrete.copy(deep=False), 0.5)
+    # selected_clusters = old_clusters_2
+    # ncol = 4
+    # nrows = int(len(selected_clusters)/float(ncol))+1
+    # fig, axs = plt.subplots(nrows, ncol)
+    # fig.suptitle('coexpression old_1 clusters matching error')
+    # axs = axs.flat
+    # ind_plot = 0
+    # for cluster in selected_clusters:
+    #     ax = axs[ind_plot]
+    #     body =  [ instance.get_atom_index(atom) for atom in cluster ]
+    #     # fig, ax = plt.subplots()
+    #     ax.set_title('cluster ' + str(cluster_index))
+    #     plot_cluster_umap(df_discrete, df_umap, instance, body, ax)
+    #     ind_plot += 1
+
+
+    # ##########################################################################
+    # display the biomarkers from the clusters
+    biom_list = ['AIF1', 'BLK', 'CCL2', 'CCL5', 'CCR6', 'CD14', 'CD16', 'CD180', 'CD19', 'CD37', 'CD3D']
+    biom_list += ['CD3E', 'CD40LG', 'CD72', 'CD74', 'CD79A', 'CD79B', 'CD80', 'CD83', 'CD8A', 'CD8B', 'CD96', 'CSF1R', 'CST7']
+    biom_list += ['CTLA4', 'CXCR5', 'FASLG', 'FCER1A', 'FCER1G', 'FCGR3A', 'FCN1', 'FCRL2', 'FLT3', 'GNLY', 'GPR183', 'GZMB']
+    biom_list += ['GZMH', 'HLA-DMA', 'HLA-DQA1', 'HTR3A', 'IL1R2', 'IL2RB', 'IL32', 'IL6R', 'IL7R', 'ITGAX', 'ITM2A']
+    biom_list += ['KIR2DL3', 'KLRC1', 'KLRD1', 'KLRG1', 'LGALS2', 'LGALS3', 'LST1', 'LYZ', 'MS4A1']
+    biom_list += ['NCAM1', 'NKG7', 'PAX5', 'PIKFYVE', 'PNOC', 'PRF1', 'S100A4', 'S100A9', 'SPIB', 'STAP1']
+    biom_list += ['TBX21', 'TCL1A' , 'TCL1B', 'TLR7', 'TNFRSF13B', 'TYROBP', 'VPREB3', 'ZBTB16']
+
+    for cluster_index in [6,7,8,9,11,20]:
+        genes_markers =  [ graph.atoms[index] for index in clusters[ cluster_index ] if graph.atoms[index][0] in biom_list ]
+
+        print('\n\nmarkers for cluster ', cluster_index, ': \n')
+        # print(genes_markers)
+
+        for elt in genes_markers:
+            print(elt[0], ': ', elt[1], '/', instance.n_values[elt[0]]-1)
+
+    # ##########################################################################
+
 
     plt.show()
 
