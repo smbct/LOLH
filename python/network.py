@@ -364,14 +364,14 @@ class Graph:
 
 
     #------------------------------------------------------------------------------
-    def plot(self, ax, col_option, arrows = False, cluster_size_limit = 20):
+    def plot(self, ax, col_option, arrows = False, cluster_size_limit = 20, cluster_list = None, legend_loc = None):
 
         # arrows: draw arrows instead of edges
 
         # plot the graph from force atlas 2 2d positions
 
-        ax.get_xaxis().set_visible(False)
-        ax.get_yaxis().set_visible(False)
+        # ax.get_xaxis().set_visible(False)
+        # ax.get_yaxis().set_visible(False)
 
         # plot the clusters labels
         for ind_cluster in self.clusters:
@@ -391,8 +391,15 @@ class Graph:
 
         if col_option == 'clustering_colors':
             # create a legend for the clusters
-            legend_elements = [ mpatches.Patch(facecolor=self.color_palette[ind_cluster%len(self.color_palette)], label='c'+str(ind_cluster)) for ind_cluster in self.clusters if len(self.clusters[ind_cluster]) >= cluster_size_limit]
-            ax.legend(handles=legend_elements, loc='upper left')
+            if cluster_list == None:
+                legend_elements = [ mpatches.Patch(facecolor=self.color_palette[ind_cluster%len(self.color_palette)], label='c'+str(ind_cluster)) for ind_cluster in self.clusters if len(self.clusters[ind_cluster]) >= cluster_size_limit]
+            else:
+                legend_elements = [ mpatches.Patch(facecolor=self.color_palette[ind_cluster%len(self.color_palette)], label='cluster '+str(ind_cluster)) for ind_cluster in cluster_list if len(self.clusters[ind_cluster]) >= cluster_size_limit]
+
+            if legend_loc == None:
+                ax.legend(handles=legend_elements, loc='upper left')
+            else:
+                ax.legend(handles=legend_elements, loc=legend_loc)
 
         elif col_option == '01_colors': # legend for 0/1 value
             # create for expressed/unexpressed
@@ -431,12 +438,12 @@ class Graph:
             #        atom_color = 'green'
 
 
-            text = ax.text(self.positions[ind][0], self.positions[ind][1], atom[0]+'_'+str(atom[1]), ha="center", va="center", color=atom_color, fontsize=8, fontweight='bold', zorder=1).set_clip_on(True)
+            # text = ax.text(self.positions[ind][0], self.positions[ind][1], atom[0]+'_'+str(atom[1]), ha="center", va="center", color=atom_color, fontsize=8, fontweight='bold', zorder=1).set_clip_on(True)
 
             vertices_positions.append(self.positions[ind])
             vertices_colors.append(atom_color)
 
-        # ax.scatter([elt[0] for elt in vertices_positions], [elt[1] for elt in vertices_positions], c=vertices_colors, marker='x', zorder=1)
+        ax.scatter([elt[0] for elt in vertices_positions], [elt[1] for elt in vertices_positions], c=vertices_colors, marker='x', zorder=1)
 
         if arrows:
             X = [self.positions[edge[0]][0] for edge in self.edges]
