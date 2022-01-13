@@ -1,6 +1,6 @@
 # LOLH: Learning Optimized Logical Hypothesis
 
-![LOLH framework examples (visuals)](banner_alpha.png)
+![LOLH framework examples (visuals)](banner.png)
 
 ## Background
 
