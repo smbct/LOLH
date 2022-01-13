@@ -438,12 +438,12 @@ class Graph:
             #        atom_color = 'green'
 
 
-            # text = ax.text(self.positions[ind][0], self.positions[ind][1], atom[0]+'_'+str(atom[1]), ha="center", va="center", color=atom_color, fontsize=8, fontweight='bold', zorder=1).set_clip_on(True)
+            text = ax.text(self.positions[ind][0], self.positions[ind][1], atom[0]+'_'+str(atom[1]), ha="center", va="center", color=atom_color, fontsize=8, fontweight='bold', zorder=1).set_clip_on(True)
 
             vertices_positions.append(self.positions[ind])
             vertices_colors.append(atom_color)
 
-        ax.scatter([elt[0] for elt in vertices_positions], [elt[1] for elt in vertices_positions], c=vertices_colors, marker='x', zorder=1)
+        # ax.scatter([elt[0] for elt in vertices_positions], [elt[1] for elt in vertices_positions], c=vertices_colors, marker='x', zorder=1)
 
         if arrows:
             X = [self.positions[edge[0]][0] for edge in self.edges]

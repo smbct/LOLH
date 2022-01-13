@@ -1,5 +1,7 @@
 # LOLH: Learning Optimized Logical Hypothesis
 
+![LOLH framework examples (visuals)](banner_alpha.png)
+
 ## Background
 
 LOLH is an Inductive Logic Programming framework based on the Learning From Interpretation Transition ([LFIT](https://github.com/Tony-sama/pylfit.git)) framework. Its goal is to learn logic rules from single-cell gene expressions data, on order to infer relations between the genes. LOLH performs a selection of the genes based on a discrete optimization problem formulation (see references below). It is implemented in c++ and python (3.8).
