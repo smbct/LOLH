@@ -1,14 +1,14 @@
 # LOLH: Learning Optimized Logical Hypothesis
 
-![LOLH framework examples (visuals)](banner_alpha.png)
+![LOLH framework examples (visuals)](banner.png)
 
 ## Background
 
-LOLH is an Inductive Logic Programming framework based on the Learning From Interpretation Transition ([LFIT](https://github.com/Tony-sama/pylfit.git)) framework. Its goal is to learn logic rules from single-cell gene expressions data, on order to infer relations between the genes. LOLH performs a selection of the genes based on a discrete optimization problem formulation (see references below). It is implemented in c++ and python (3.8).
+LOLH is an Inductive Logic Programming framework based on the Learning From Interpretation Transition ([LFIT](https://github.com/Tony-sama/pylfit.git)) framework. Its goal is to learn logic rules from single-cell gene expression data, in order to infer logical/combinatorial relations between the genes. LOLH performs a selection of the genes based on a discrete optimization problem formulation (see references below). It is implemented in c++ and python 3.8.
 
 ## Dependencies
 
-The following python packages are required to execute all the code from the examples: scipy, numpy, pandas, scikit-learn, networkx, python-louvain, umap-learn and matplotlib. pylfit is also required to perform a comparison between the PRIDE and LOLH algorithms. The c++ code relies on openmp. The R script `DE_testing.R` for differential expression (DE) analysis relies on the R package [Seurat](https://satijalab.org/seurat/).
+The following python packages are required to execute all the code from the examples: `scipy`, `numpy`, `pandas`, `scikit-learn`, `networkx`, `python-louvain`, `umap-learn` and `matplotlib`. `pylfit` is also required to perform a comparison between the PRIDE and LOLH algorithms. The c++ code relies on openmp. The R script `DE_testing.R` for differential expression (DE) analysis relies on the R package [Seurat](https://satijalab.org/seurat/).
 
 ## Usage
 
@@ -35,9 +35,11 @@ Dynamical analysis of a singe-cell dataset intends to reveal regulatory interact
 
 Alternatives are considered for the inference of logical relations from dynamical data, including using RNA velocity methods for single-cell.
 
-## Acknowledgment:
+## Acknowledgment
 
-## References:
+Special thanks to Tony Ribeiro for his help with the LFIT framework and for suggesting the name LOLH, and to the Imagine Institute, and especially to Francesco Carbone and Mickaël Ménager for providing the dataset and performing statistical analyses and biological comparisons.
+
+## References
 
 * Samuel Buchet, Francesco Carbone, Morgan Magnin, Mickaël Ménager, and Olivier Roux. 2021. Inference of Gene Networks from Single Cell Data through Quantified Inductive Logic Programming. In The 12th International Conference on Computational Systems-Biology and Bioinformatics (CSBio2021). Association for Computing Machinery, New York, NY, USA, 48–63. DOI:https://doi.org/10.1145/3486713.3486746
 
