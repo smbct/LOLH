@@ -128,8 +128,8 @@ def plot_cluster_umap(df_discrete, df_coordinates, instance, body, ax):
     ax.set_aspect((ax.get_xlim()[1]-ax.get_xlim()[0])/(ax.get_ylim()[1]-ax.get_ylim()[0]))
 
     cbar = ax.get_figure().colorbar(cm.ScalarMappable(norm=cnorm, cmap=plasma), ax=ax)
-    # cbar.set_label('Matching error')
-    cbar.set_label('Erreur de couv.')
+    cbar.set_label('Matching error')
+    # cbar.set_label('Erreur de couv.')
 
     return
 
@@ -260,8 +260,9 @@ def global_analysis():
     cluster_size_limit = 20
     fig, ax = plt.subplots()
     # graph.plot(ax, col_option, arrows, cluster_size_limit)
-    # ax.set_title('Dynamical graph')
-    graph.plot(ax, col_option, arrows, cluster_size_limit, [6,7,8,9,11,20])
+    ax.set_title('2d representation of the dynamical graph')
+    # graph.plot(ax, col_option, arrows, cluster_size_limit, [6,7,8,9,11,20])
+    graph.plot(ax, col_option, arrows, cluster_size_limit)
     # ax.set_title('Graphe dynamique')
     ax.set_aspect((ax.get_xlim()[1]-ax.get_xlim()[0])/(ax.get_ylim()[1]-ax.get_ylim()[0]))
     ax.set_xlabel('FA 1')
@@ -296,13 +297,13 @@ def global_analysis():
     cograph.load_from_file('../../dataset/Imagine/coexpression/coexpression_graph.txt')
 
     # display the coexpression graph
-    print('display the coexpression graph')
+    print('\n\ndisplaying the coexpression graph\n\n')
     col_option = 'clustering_colors'
     fig, ax = plt.subplots()
     # cograph.plot(ax, col_option, False, 10)
-    # ax.set_title('Coexpression graph')
-    # ax.set_title('Graphe de co-expression')
-    cograph.plot(ax, col_option, False, 10, [1,2,5], 'upper right')
+    ax.set_title('2d representation of the coexpression graph')
+    # cograph.plot(ax, col_option, False, 10, [1,2,5], 'upper right')
+    cograph.plot(ax, col_option, False, 10)
     ax.set_aspect((ax.get_xlim()[1]-ax.get_xlim()[0])/(ax.get_ylim()[1]-ax.get_ylim()[0]))
     ax.set_xlabel('FA 1')
     ax.set_ylabel('FA 2')
@@ -379,7 +380,7 @@ def global_analysis():
 
     # ##########################################################################
 
-    print('plot the dynamical clusters')
+    print('\n\nplotting the dynamical clusters\n\n')
     # create a fake instance
     instance = Instance.create_random_instance(df_discrete.copy(deep=False), 0.5)
     # cluster_index = list(clusters.keys())[0]
@@ -390,7 +391,7 @@ def global_analysis():
     ncol = 2
     nrows = int(len(selected_clusters)/float(ncol))
     fig, axs = plt.subplots(nrows, ncol)
-    # fig.suptitle('dynamical clusters matching error')
+    fig.suptitle('Dynamical clusters matching error on the cells')
     axs = axs.flat
     ind_plot = 0
     for cluster_index in selected_clusters:
@@ -406,93 +407,81 @@ def global_analysis():
 
     # ##########################################################################
 
-    print('plot the coexpression clusters')
-    # create a fake instance
-    instance = Instance.create_random_instance(df_discrete.copy(deep=False), 0.5)
-
-    selected_clusters = [cl for cl in coexpression_clusters]
-
-    ncol = 2
-    nrows = int(len(selected_clusters)/float(ncol))
-    fig, axs = plt.subplots(nrows, ncol)
-    fig.suptitle('coexpression clusters matching error')
-    axs = axs.flat
-    ind_plot = 0
-    for cluster_index in selected_clusters:
-        ax = axs[ind_plot]
-        body =  [ instance.get_atom_index(cograph.atoms[index]) for index in coexpression_clusters[ cluster_index ] ]
-        # fig, ax = plt.subplots()
-        ax.set_title('cluster ' + str(cluster_index))
-        plot_cluster_umap(df_discrete, df_umap, instance, body, ax)
-        ind_plot += 1
+    # print('\n\nplot the coexpression clusters\n\n')
+    # # create a fake instance
+    # instance = Instance.create_random_instance(df_discrete.copy(deep=False), 0.5)
+    #
+    # selected_clusters = [cl for cl in coexpression_clusters]
+    #
+    # ncol = 2
+    # nrows = int(len(selected_clusters)/float(ncol))
+    # fig, axs = plt.subplots(nrows, ncol)
+    # fig.suptitle('coexpression clusters matching error')
+    # axs = axs.flat
+    # ind_plot = 0
+    # for cluster_index in selected_clusters:
+    #     ax = axs[ind_plot]
+    #     body =  [ instance.get_atom_index(cograph.atoms[index]) for index in coexpression_clusters[ cluster_index ] ]
+    #     # fig, ax = plt.subplots()
+    #     ax.set_title('cluster ' + str(cluster_index))
+    #     plot_cluster_umap(df_discrete, df_umap, instance, body, ax)
+    #     ind_plot += 1
 
     # ##########################################################################
 
 
-
-    # # plot a single gene
-    # gene = 'PPBP'
-    # gene = 'S100A4'
-    # gene = 'ANXA1'
-    # gene = 'DERL3'
-    #
+    # # ##########################################################################
+    # # plot cluster 8 and selection of cells
     # fig, ax = plt.subplots()
-    # ax.set_title('gene ' + gene)
-    # plot_gene_umap(df_normalized, df_umap, gene, ax)
-
-
-
-
-    # plot cluster 8
-    fig, ax = plt.subplots()
-    body =  [ instance.get_atom_index(graph.atoms[index]) for index in clusters[ 8 ] ]
-    plot_cluster_umap(df_discrete, df_umap, instance, body, ax)
-    ax.set_title('Cluster 8 error on the cells')
-
-    # cluster 8 histogram
-    histo = histogram.Histogram(instance, body, histogram.Histogram_type.GLOBAL)
-    values = [ error for error in range(len(histo.positive_histogram)) for _ in histo.positive_histogram[error] ]
-    fig,ax = plt.subplots()
-    ax.hist(values, 50, density=True, edgecolor='black')
-    ax.set_ylabel('proportion de cellules')
-    ax.set_xlabel('erreur de couverture')
-
-    # threshold <= 140
-    selected_cells = []
-    for i in range(190):
-        selected_cells += histo.positive_histogram[i]
-    # print(selected_cells)
-
-    T_cells = list(df_cell_macrotypes.loc[df_cell_macrotypes['cellType_macro'] == 'T'].index)
-
-    # print(T_cells)
-
-    selected_cells = [cell for cell in selected_cells if cell in T_cells]
-    other_cells = [cell for cell in T_cells if not cell in selected_cells]
-
-    df_selected_cells = pd.DataFrame([1]*len(selected_cells)+[0]*len(other_cells), index = selected_cells+other_cells, columns=['X'])
-    # print(df_selected_cells)
-    # print(selected_cells+other_cells)
-    df_selected_cells.to_csv('selected_cells_dynamics_c20.csv')
-
-    fig,ax = plt.subplots()
-    ax.scatter(df_umap['UMAP_1'][:], df_umap['UMAP_2'][:], s=5, c=['red'  if cell in selected_cells else 'black' for cell in df_umap.index])
-
-    # print('cluster 8:')
-    # print_cluster_latex(instance, [graph.atoms[index] for index in clusters[ 8 ]])
-
-    # plot cluster 20
-    fig, ax = plt.subplots()
-    body =  [ instance.get_atom_index(graph.atoms[index]) for index in clusters[ 20 ] ]
-    plot_cluster_umap(df_discrete, df_umap, instance, body, ax)
-    ax.set_title('Cluster 20 error on the cells')
+    # body =  [ instance.get_atom_index(graph.atoms[index]) for index in clusters[ 8 ] ]
+    # plot_cluster_umap(df_discrete, df_umap, instance, body, ax)
+    # ax.set_title('Cluster 8 error on the cells')
+    #
+    # # cluster 8 histogram
+    # histo = histogram.Histogram(instance, body, histogram.Histogram_type.GLOBAL)
+    # values = [ error for error in range(len(histo.positive_histogram)) for _ in histo.positive_histogram[error] ]
+    # fig,ax = plt.subplots()
+    # ax.hist(values, 50, density=True, edgecolor='black')
+    # ax.set_ylabel('proportion de cellules')
+    # ax.set_xlabel('erreur de couverture')
+    #
+    # # threshold <= 140
+    # selected_cells = []
+    # for i in range(190):
+    #     selected_cells += histo.positive_histogram[i]
+    #
+    # T_cells = list(df_cell_macrotypes.loc[df_cell_macrotypes['cellType_macro'] == 'T'].index)
+    #
+    # selected_cells = [cell for cell in selected_cells if cell in T_cells]
+    # other_cells = [cell for cell in T_cells if not cell in selected_cells]
+    #
+    # df_selected_cells = pd.DataFrame([1]*len(selected_cells)+[0]*len(other_cells), index = selected_cells+other_cells, columns=['X'])
+    # # print(df_selected_cells)
+    # # print(selected_cells+other_cells)
+    # df_selected_cells.to_csv('selected_cells_dynamics_c20.csv')
+    #
+    # fig,ax = plt.subplots()
+    # ax.scatter(df_umap['UMAP_1'][:], df_umap['UMAP_2'][:], s=5, c=['red'  if cell in selected_cells else 'black' for cell in df_umap.index])
+    #
+    # # print('cluster 8:')
+    # # print_cluster_latex(instance, [graph.atoms[index] for index in clusters[ 8 ]])
+    #
+    # # plot cluster 20
+    # fig, ax = plt.subplots()
+    # body =  [ instance.get_atom_index(graph.atoms[index]) for index in clusters[ 20 ] ]
+    # plot_cluster_umap(df_discrete, df_umap, instance, body, ax)
+    # ax.set_title('Cluster 20 error on the cells')
 
 
     # print('cluster 20:')
     # print_cluster_latex(instance, [graph.atoms[index] for index in clusters[ 20 ]])
 
+
+    # ##########################################################################
+    # Output the clusters in csv files
     output_clusters_edges = False
     if output_clusters_edges:
+
         # create a dataset with all the clusters
         data = []
         for cluster_index in clusters:
@@ -524,6 +513,8 @@ def global_analysis():
         df_connecting_edges = pd.DataFrame(connecting_edges, columns=['left gene', 'left value', 'left cluster', 'right gene', 'right value', 'right cluster'])
         df_connecting_edges.to_csv('dynmical_connecting_edges.csv')
 
+
+
     ###############################################
     # compare dynamical clusters between themselves
     ###############################################
@@ -539,10 +530,11 @@ def global_analysis():
         shared = [elt for elt in genes_c1 if elt in genes_c2]
         print('between cluster ', ind_1, '(', len(genes_c1), ') and ', ind_2, '(', len(genes_c2), ') genes: ', len(shared), ' genes are shared')
 
+
+
     ###############################################
     # compare dynamical and coexpression clusters
     ###############################################
-
 
     # compute number of atoms shared between a dynamical and a coexpression cluster
     print('\n\nShared atoms between the dynamical and the coexpression clusters:\n')
@@ -624,6 +616,9 @@ def global_analysis():
 
     # ##########################################################################
     # display the biomarkers from the clusters
+
+    print('\n\nBimarkers in the dynamical clusters:\n\n')
+
     biom_list = ['AIF1', 'BLK', 'CCL2', 'CCL5', 'CCR6', 'CD14', 'CD16', 'CD180', 'CD19', 'CD37', 'CD3D']
     biom_list += ['CD3E', 'CD40LG', 'CD72', 'CD74', 'CD79A', 'CD79B', 'CD80', 'CD83', 'CD8A', 'CD8B', 'CD96', 'CSF1R', 'CST7']
     biom_list += ['CTLA4', 'CXCR5', 'FASLG', 'FCER1A', 'FCER1G', 'FCGR3A', 'FCN1', 'FCRL2', 'FLT3', 'GNLY', 'GPR183', 'GZMB']
@@ -635,13 +630,19 @@ def global_analysis():
     for cluster_index in [6,7,8,9,11,20]:
         genes_markers =  [ graph.atoms[index] for index in clusters[ cluster_index ] if graph.atoms[index][0] in biom_list ]
 
-        print('\n\nmarkers for cluster ', cluster_index, ': \n')
+        print('\n\nmarkers for cluster ' + str(cluster_index) + ':')
         # print(genes_markers)
 
+        list_biom_str = ''
         for elt in genes_markers:
-            print(elt[0], ': ', elt[1], '/', instance.n_values[elt[0]]-1)
+            list_biom_str += elt[0] + '_{' + str(elt[1]) + '/' + str(instance.n_values[elt[0]]-1) + '}, '
+        print(list_biom_str + '\n')
 
     # ##########################################################################
+
+    # print('\n\ncluster 11:\n\n\n')
+    # for index in clusters[ 11 ]:
+    #     print(graph.atoms[index])
 
 
     plt.show()
