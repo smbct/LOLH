@@ -196,7 +196,18 @@ def plot_transitions_parameters_quality():
 
     return
 
-plot_transitions_parameters_quality()
+#-------------------------------------------------------------------------------
+def selected_parameters_quality():
+
+    filename = 'transitions_quality.txt'
+    data = read_quality_file(filename)
+    fig, ax = plt.subplots()
+
+    plt.show()
+
+    return
+
+# plot_transitions_parameters_quality()
 
 # filename = 'coexpression_quality.txt'
 # data = read_quality_file(filename)

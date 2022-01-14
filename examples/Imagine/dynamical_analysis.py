@@ -210,7 +210,7 @@ def print_cluster_latex(instance, cluster):
 def global_analysis():
 
 
-    # create_regulatory_graph()
+    create_regulatory_graph()
 
     # load the graph from an existing file
     filename = '../../dataset/Imagine/dynamics/regulatory_network_processed.txt'
@@ -267,6 +267,8 @@ def global_analysis():
     ax.set_aspect((ax.get_xlim()[1]-ax.get_xlim()[0])/(ax.get_ylim()[1]-ax.get_ylim()[0]))
     ax.set_xlabel('FA 1')
     ax.set_ylabel('FA 2')
+    ax.xaxis.set_major_locator(ticker.NullLocator())
+    ax.yaxis.set_major_locator(ticker.NullLocator())
 
     # col_option = 'clustering_colors'
     # fig, ax = plt.subplots()
@@ -307,6 +309,8 @@ def global_analysis():
     ax.set_aspect((ax.get_xlim()[1]-ax.get_xlim()[0])/(ax.get_ylim()[1]-ax.get_ylim()[0]))
     ax.set_xlabel('FA 1')
     ax.set_ylabel('FA 2')
+    ax.xaxis.set_major_locator(ticker.NullLocator())
+    ax.yaxis.set_major_locator(ticker.NullLocator())
 
     print('number of clusters in the dynamical graph initially: ', len(cograph.clusters))
     coexpression_clusters = {}
@@ -640,9 +644,16 @@ def global_analysis():
 
     # ##########################################################################
 
-    # print('\n\ncluster 11:\n\n\n')
-    # for index in clusters[ 11 ]:
-    #     print(graph.atoms[index])
+    # for ind_cluster in [8, 11, 20]:
+    #     cl = clusters[ ind_cluster ].copy()
+    #     print('\n\ncluster ', ind_cluster, ' : ', len(cl),  '\n\n\n')
+    #     cl.sort(key=lambda index: graph.atoms[index][0])
+    #     for index in cl:
+    #         print(graph.atoms[index])
+
+    print('\n\nLength of the clusters from the dynamical graph:')
+    for ind_cluster in clusters:
+        print(len(clusters[ind_cluster]), 'atoms in cluster', ind_cluster, '\n\n')
 
 
     plt.show()
