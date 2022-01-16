@@ -48,14 +48,14 @@ def plot_quality(data, ax, annotations):
         proportions_pos = [data[ind][3]/(data[ind][3]+data[ind][4]) for ind in indexes if data[ind][1] > 0]
         qualities_nul = [data[ind][2] for ind in indexes if data[ind][1] == 0]
         proportions_nul = [data[ind][3]/(data[ind][3]+data[ind][4]) for ind in indexes if data[ind][1] == 0]
-        ax.scatter(qualities_nul, proportions_nul, s=6, marker='.', c='firebrick', label='atomes nuls')
-        ax.scatter(qualities_pos, proportions_pos, s=6, marker='.', c='royalblue', label='atomes non nuls')
+        ax.scatter(qualities_nul, proportions_nul, s=6, marker='.', c='firebrick', label='null atoms')
+        ax.scatter(qualities_pos, proportions_pos, s=6, marker='.', c='royalblue', label='positive atoms')
 
 
-        ax.set_xlabel('qualité des corrélations')
+        ax.set_xlabel('correlations quality')
 
 
-        ax.set_ylabel(r'proportion entre $\mathcal{S}^+$ et $\mathcal{S}^-$')
+        ax.set_ylabel(r'proportion between $\mathcal{S}^+$ and $\mathcal{S}^-$')
         ax.legend(loc='lower left', markerscale=4.0)
 
     # ind2 = 0
@@ -202,6 +202,10 @@ def selected_parameters_quality():
     filename = 'transitions_quality.txt'
     data = read_quality_file(filename)
     fig, ax = plt.subplots()
+
+    ax.set_title(r'Corelation quality with $(\tau = 0.6, \rho = 0, \delta = 1)$')
+    plot_quality(data, ax, True)
+
 
     plt.show()
 

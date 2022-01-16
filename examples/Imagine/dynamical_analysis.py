@@ -62,17 +62,17 @@ def reduce_graphe(graph, threshold):
 #-------------------------------------------------------------------------------
 def create_regulatory_graph():
 
-    filename = '../../dataset/Imagine/regulatory_network03.txt'
+    filename = '../../dataset/Imagine/dynamics/regulatory_network03.txt'
     graph = load_graph_file(filename)
 
     # create a new file and truncate some edges
     threshold = 0.5
     graph_reduced = reduce_graphe(graph, threshold)
 
-    filename = '../../dataset/Imagine/regulatory_network05.txt'
+    filename = '../../dataset/Imagine/dynamics/regulatory_network05.txt'
     save_graph_file(filename, graph_reduced)
 
-    filename = '../../dataset/Imagine/regulatory_network05.txt'
+    filename = '../../dataset/Imagine/dynamics/regulatory_network05.txt'
     ncell_min = 50
     score_min = 0.5
     data = GData()
@@ -718,7 +718,7 @@ def sub_analysis():
     return
 
 #-------------------------------------------------------------------------------
-def alternartive_network():
+def alternative_network():
 
     # load the discrete dataset
     filename = '../../dataset/Imagine/discrete_matrix.csv'
@@ -871,8 +871,8 @@ def alternartive_network():
 
     return
 
-global_analysis()
+# global_analysis()
 
 # sub_analysis()
 
-# alternartive_network()
+# alternative_network()
