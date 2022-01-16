@@ -31,9 +31,9 @@ The analysis of coexpression consists in computing discrete correlations between
 
 * Dynamical analysis:
 
-Dynamical analysis of a singe-cell dataset intends to reveal regulatory interactions between the genes. To do so, transitions are computed from the dataset by using a neighborhood graph of the cells (computed from Seurat). From this graph, dynamical correlations across the transitions are inferred with LOLH. This modeling approach unveils more complex relations between the genes.
+Dynamical analysis of a singe-cell dataset intends to reveal regulatory interactions between the genes. To do so, transitions are computed from the dataset by using a neighborhood graph of the cells (computed from Seurat, with the `extract_transitions.R`). From this graph, dynamical correlations across the transitions are inferred with LOLH. This modeling approach can be performed with the script `dynamics_main.py`.
 
-Alternatives are considered for the inference of logical relations from dynamical data, including using RNA velocity methods for single-cell.
+Alternative methods are considered for the inference of logical relations from dynamical data, including using RNA velocity methods for single-cell.
 
 ## Acknowledgment
 

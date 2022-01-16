@@ -247,9 +247,12 @@ void NetworkInduction::computeRegulationNetwork(DataFrame<uint>& dataset, NGraph
   // #endif
 
   /* nb atoms done */
-  #if DEBUG_LOG == 1
+  // #if DEBUG_LOG == 1
+  // uint nAtomsDone = 0;
+  // #endif
+
   uint nAtomsDone = 0;
-  #endif
+
 
   #if USE_OPENMP == 1
   #pragma omp parallel num_threads(N_THREADS)
@@ -352,10 +355,17 @@ void NetworkInduction::computeRegulationNetwork(DataFrame<uint>& dataset, NGraph
     cout << debugStr << endl << endl;
     #endif
 
-    #if DEBUG_LOG == 1
+    // #if DEBUG_LOG == 1
     nAtomsDone ++;
-    cout << "n atoms done yet: " << nAtomsDone << endl;
-    #endif
+    if(nAtomsDone % 500 == 0) {
+      cout << "n atoms done yet: " << nAtomsDone << " over " << target.size() << endl;
+    }
+    // #endif
+
+    // nAtomsDone ++;
+    // if(nAtomsDone % 500 == 0) {
+    // cout << "n atoms done yet: " << nAtomsDone << " over " << target.size() << endl;
+    // }
 
     // cout << dataset.getColLabel(elt.first) << " - " << elt.first << " - " << elt.second << " : fin" << endl;
 
