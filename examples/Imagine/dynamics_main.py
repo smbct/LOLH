@@ -18,6 +18,7 @@ print('*************************************************************************
 print('  Dynamical analysis of the pbmc dataset from Imagine institute with LOLH   ')
 print('****************************************************************************')
 
+os.system('mkdir ../../dataset/Imagine/dynamics')
 
 print('\n\n')
 print('1) Extraction of transitions from the neighborhood graph with Seurat')
@@ -30,7 +31,7 @@ print('2) Computation of atom correlations for a set of parameters')
 cmd = './../../c++/main'
 cmd += ' -r -cq'
 cmd += ' -im ../../dataset/Imagine/discrete_matrix.csv'
-cmd += ' -o transitions_quality.txt'
+cmd += ' -o ../../dataset/Imagine/dynamics/transitions_quality.txt'
 cmd += ' -it ../../dataset/Imagine/transitions.csv'
 cmd += ' -tr 0.6 -pnq 0 -td 1 -v'
 os.system(cmd)
