@@ -648,12 +648,29 @@ def k_fold_cross_validation(df, instance, k):
     print(LOLH_perf)
     print('\n')
 
+    # print('positives: ')
+    # print(np.mean(LOLH_perf[0]), np.var(LOLH_perf[0]))
+    # print('negatives: ')
+    # print(np.mean(LOLH_perf[1]), np.var(LOLH_perf[1]))
+
     print('Performances of PRIDE:\n')
     print(PRIDE_perf)
     print('\n')
 
+    # print('positives: ')
+    # print(np.mean(PRIDE_perf[0]), np.var(PRIDE_perf[0]))
+    #
+    # print('negatives: ')
+    # print(np.mean(PRIDE_perf[1]), np.var(PRIDE_perf[1]))
+
+
     print('Performances of a RANDOM rule:\n')
     print(RANDOM_perf)
+
+    # print('positives: ')
+    # print(np.mean(RANDOM_perf[0]), np.var(RANDOM_perf[0]))
+    # print('negatives: ')
+    # print(np.mean(RANDOM_perf[1]), np.var(RANDOM_perf[1]))
 
     return
 
