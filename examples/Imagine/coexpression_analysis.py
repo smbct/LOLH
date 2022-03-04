@@ -323,6 +323,11 @@ def process_global_clusters():
     fig,ax = plt.subplots()
     values = [ error for error in range(len(histo.positive_histogram)) for _ in histo.positive_histogram[error] ]
     ax.hist(values, 50, density=True, edgecolor='black')
+    # print(ax.get_ylim())
+    temp_ylim = ax.get_ylim()
+    ax.plot([193, 193], [ax.get_ylim()[0], ax.get_ylim()[1]], '--', color='red')
+    ax.set_ylim(temp_ylim)
+    # print(ax.get_ylim())
     ax.set_ylabel('cell proportion')
     ax.set_xlabel('matching error')
     ax.set_title('Matching error of gene cluster ' + str(ind_cluster) + ' on all cells')
@@ -341,14 +346,16 @@ def process_global_clusters():
 
     # plot a UMAP with the selected cells
     fig, ax = plt.subplots()
-    ax.set_xlabel('UMAP_1')
-    ax.set_ylabel('UMAP_2')
-    ax.set_title('Selected cells from gene cluster ' + str(ind_cluster))
+    ax.set_xlabel('UMAP 1')
+    ax.set_ylabel('UMAP 2')
+    # ax.set_title('Selected cells from gene cluster ' + str(ind_cluster))
     colors = ['red' if barcode in selected_cells else 'black' for barcode in df_coordinates.index]
 
 
     ax.scatter(df_coordinates.loc[selected_cells]['UMAP_1'], df_coordinates.loc[selected_cells]['UMAP_2'], c='red', s=3, label='selected cells', zorder=1)
+    # ax.scatter(df_coordinates.loc[selected_cells]['UMAP_1'], df_coordinates.loc[selected_cells]['UMAP_2'], c='red', s=3, label='cellules sélectionnées', zorder=1)
     ax.scatter(df_coordinates.loc[other_cells]['UMAP_1'], df_coordinates.loc[other_cells]['UMAP_2'], c='black', s=3, label='other cells', zorder=0)
+    # ax.scatter(df_coordinates.loc[other_cells]['UMAP_1'], df_coordinates.loc[other_cells]['UMAP_2'], c='black', s=3, label='autres cellules', zorder=0)
     ax.set_aspect((ax.get_xlim()[1]-ax.get_xlim()[0])/(ax.get_ylim()[1]-ax.get_ylim()[0]))
     ax.set_title('Cells selected through the matching error from cluster ' + str(ind_cluster))
     ax.legend(loc='upper right')
