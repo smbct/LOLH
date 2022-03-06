@@ -874,7 +874,7 @@ def alternative_network():
 
     return
 
-global_analysis()
+# global_analysis()
 
 # sub_analysis()
 
