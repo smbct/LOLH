@@ -223,6 +223,9 @@ def global_analysis():
             clusters[cluster] = graph.clusters[cluster]
     # print(clusters)
 
+    print('number of clusters in the dynamical graph initially: ', len(graph.clusters))
+    print('number of selected clusters (size <= 20): ', len(clusters))
+
     # load the discrete dataset
     filename = '../../dataset/Imagine/discrete_matrix.csv'
     df_discrete = pd.read_csv(filename, index_col = 0)
@@ -312,7 +315,7 @@ def global_analysis():
     ax.xaxis.set_major_locator(ticker.NullLocator())
     ax.yaxis.set_major_locator(ticker.NullLocator())
 
-    print('number of clusters in the dynamical graph initially: ', len(cograph.clusters))
+    print('number of clusters in the coexpression graph initially: ', len(cograph.clusters))
     coexpression_clusters = {}
     for cluster in cograph.clusters:
         if len(cograph.clusters[cluster]) >= 20:
@@ -871,7 +874,7 @@ def alternative_network():
 
     return
 
-# global_analysis()
+global_analysis()
 
 # sub_analysis()
 
