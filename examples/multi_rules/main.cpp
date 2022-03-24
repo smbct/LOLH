@@ -32,7 +32,8 @@ int main() {
 
   // Run the solver with a 500 microseconds budget
   // bool found = solver.solve( cost, solution, 500us );
-  bool found = solver.solve( cost, solution, 1800s );
+  // bool found = solver.solve( cost, solution, 1800s );
+  bool found = solver.solve( cost, solution, 600s );
 
   // After 500 microseconds, the solver will write in cost and solution the best solution it has found.
   found ? std::cout << "Solution found\n" : std::cout << "Solution not found\n";
@@ -45,7 +46,7 @@ int main() {
   std::cout << "\n";
 
   /* export the solution to a file */
-  std::ofstream file("sol.txt");
+  std::ofstream file("T_sol.txt");
   file << solution.size();
   for( auto v : solution ) {
     file << " " << v;

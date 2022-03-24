@@ -40,12 +40,19 @@ df_celltypes = pd.read_csv('../../dataset/Imagine/cell_types.csv', index_col = 0
 df_celltypes.rename(columns={'cellType_final': 'Label'}, inplace=True)
 # print(df_celltypes.head())
 
+df_macrotypes = pd.read_csv('../../dataset/Imagine/cell_types_macro.csv', index_col = 0)
+df_macrotypes.rename(columns={'cellType_macro': 'Label'}, inplace=True)
+
 # initialization of the classification instance: classification of the NK cells
-celltype = 'NK'
-instance = Instance.create_cluster_instance(df_discrete.copy(deep=False), df_celltypes, celltype)
+# celltype = 'NK'
+# instance = Instance.create_cluster_instance(df_discrete.copy(deep=False), df_celltypes, celltype)
+
+celltype = 'T'
+instance = Instance.create_cluster_instance(df_discrete.copy(deep=False), df_macrotypes, celltype)
+
 
 # export the instance to a file
-file = open('NK_instance.txt', 'w')
+file = open('T_instance.txt', 'w')
 file.write(str(len(instance._pos_samples)) + ' ')
 for ind in range(len(instance._pos_samples)):
     file.write(instance._pos_samples[ind])

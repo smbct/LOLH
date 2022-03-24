@@ -5,6 +5,12 @@
 MRuleObjective::MRuleObjective(instance_data& instance, const std::vector< ghost::Variable >& var) : ghost::Maximize(var,  "Multi rule scores" ), _instance(instance)
 {
 
+  /* creation of the list of atoms */
+  for(uint indVar = 0; indVar < _instance.dataset.nColumns(); indVar ++) {
+    for(uint indValue = 0; indValue < _instance.dataset.nUnique(indVar); indValue ++) {
+      _atoms.push_back(std::pair<uint,uint>(indVar, indValue));
+    }
+  }
 
 }
 
@@ -19,20 +25,14 @@ double MRuleObjective::compute_rule_score(const std::vector< ghost::Variable*>& 
     }
   }
 
-  /* creation of the list of atoms */
-  std::vector<std::pair<uint, uint>> atoms;
-  for(uint indVar = 0; indVar < _instance.dataset.nColumns(); indVar ++) {
-    for(uint indValue = 0; indValue < _instance.dataset.nUnique(indVar); indValue ++) {
-      atoms.push_back(std::pair<uint,uint>(indVar, indValue));
-    }
-  }
+
 
   /* computation of the scores for each atoms */
-  std::vector<uint> pos_scores(atoms.size(), 0);
-  std::vector<uint> neg_scores(atoms.size(), 0);
+  std::vector<uint> pos_scores(_atoms.size(), 0);
+  std::vector<uint> neg_scores(_atoms.size(), 0);
 
-  for(uint indAtom = 0; indAtom < atoms.size(); indAtom ++) {
-    auto atom = atoms[indAtom];
+  for(uint indAtom = 0; indAtom < _atoms.size(); indAtom ++) {
+    auto atom = _atoms[indAtom];
 
     for(uint pos : positives) {
       uint val = _instance.dataset.getData(pos, atom.first);
@@ -55,7 +55,7 @@ double MRuleObjective::compute_rule_score(const std::vector< ghost::Variable*>& 
 
   double rule_score;
 
-  for(uint indAtom = 0; indAtom < atoms.size(); indAtom ++) {
+  for(uint indAtom = 0; indAtom < _atoms.size(); indAtom ++) {
 
     double score = static_cast<double>(neg_scores[indAtom])/static_cast<double>(_instance.negatives.size());
     score -= static_cast<double>(pos_scores[indAtom])/static_cast<double>(positives.size());
