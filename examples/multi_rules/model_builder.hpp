@@ -4,20 +4,21 @@
 
 #include "../../c++/src/DataFrame.hpp"
 
+#include "instance_data.hpp"
+
 class LPOBuilder : public ghost::ModelBuilder {
 
-		int _p_rules;
-		double _t;
-
+		instance_data _instance;
 
 	public:
 
 		/*!
 		 * \brief default constructor
 		*/
-		LPOBuilder(int p_rules, double t, DataFrame<uint>& dataset);
+		LPOBuilder();
 
 		void declare_variables() override;
+		void declare_constraints() override;
 		void declare_objective() override;
 
 };
