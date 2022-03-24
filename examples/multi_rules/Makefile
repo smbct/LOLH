@@ -16,13 +16,13 @@ run: main
 	./main
 
 ../../c++/obj/%.o: ../../c++/src/%.cpp
-	g++ -std=c++17 $< -c -o $@
+	g++ -std=c++17 -o3 $< -c -o $@
 
 ./%.o: ./%.cpp
-	g++ -std=c++17 $< -c -o $@
+	g++ -std=c++17 -o3 $< -c -o $@
 
 main: $(OBJ_FILES) $(OBJ_FILES_LOLH)
-	g++ -std=c++17 $(OBJ_FILES) $(OBJ_FILES_LOLH) -lghost -pthread -o main
+	g++ -std=c++17 -o3 $(OBJ_FILES) $(OBJ_FILES_LOLH) -lghost -DGHOST_TRACE  -pthread -o main
 
 clean:
 	rm *.o ./main
