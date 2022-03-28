@@ -2,6 +2,8 @@
 
 #include "Instance.hpp"
 
+#include <set>
+
 /*!
  * \class Solver
  * \brief class managing the solutions to the problem
@@ -17,10 +19,15 @@ class Solution {
     Solution(LocalSearch::Instance& instance);
 
     /*!
-    * \brief return the score of the solution
-    * \return the score of the solution
+    * \brief recompute the score of the solution
     */
-    double computeScore();
+    void recomputeScore();
+
+    /*!
+     * \brief get the score of the solution
+     * \return the score of the solution
+     */
+    double score();
 
     /*!
      * \brief compute the score of one specific rule
@@ -47,6 +54,14 @@ class Solution {
      */
     uint getValue(int variableIndex);
 
+    /*!
+     * \brief update the value of one variable, and recompute the score accordingly
+     * \param varInd index of the variable to update
+     * \param new value value of the variable
+     */
+    void updateVariable(int varInd, int value);
+
+
   private: /* private methods */
 
 
@@ -59,10 +74,27 @@ class Solution {
     /* the assignment of the solution */
     std::vector<uint> _var;
 
+    /* the global score of the rules */
+    double _score;
+
     /* the logical atoms associated to the instance */
     std::vector<std::pair<uint,uint>> _atoms;
+
+    /* indexes of the atoms given the variable index and the logical value */
+    std::vector<std::vector<int>> _atomIndexes;
 
     /* the positive and negative errors of the atoms for each rules */
     std::vector<std::vector<std::pair<uint,uint>>> _atomErrors;
 
+    /* sum of the scores of the atoms selected for each rule */
+    std::vector<double> _sumAtomScores;
+
+    /* set of indexes for the atoms selected for the body of the rules */
+    std::vector<std::set<int>> _selectedAtoms;
+
+    /* number of atoms currently selected in the rules body */
+    std::vector<int> _nAtomsBody;
+
+    /* number of positive examples for each rule, deduced from the current assignment */
+    std::vector<int> _nPositives;
 };
