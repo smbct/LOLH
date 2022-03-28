@@ -12,6 +12,13 @@ MRuleObjective::MRuleObjective(instance_data& instance, const std::vector< ghost
     }
   }
 
+  _prev_values.resize(var.size(), 0);
+
+  // std::cout << "initial values" << std::endl;
+  // for(uint ind = 0; ind < var.size(); ind ++) {
+  //   std::cout << "var " << ind << ": "  << var[ind].get_value() << std::endl;
+  // }
+
 }
 
 /*-----------------------------------------------------------------------------*/
@@ -77,9 +84,13 @@ double MRuleObjective::compute_rule_score(const std::vector< ghost::Variable*>& 
 /*-----------------------------------------------------------------------------*/
 double MRuleObjective::required_cost( const std::vector< ghost::Variable*>& variables ) const {
 
-  // Notice the minus here.
-  // GHOST's solver tries to minimize any objective function.
-  // Thus, for maximization problems like this one, outputing '- returned_value' does the trick.
+  /* compare the current and the previous variables assignment*/
+  // std::cout << "variable assignment comparison" << std::endl;
+  // for(uint ind = 0; ind < variables.size(); ind ++) {
+  //   // if(variables[ind]->get_value() != _prev_values[ind]) {
+  //     std::cout << "var " << ind << ": "  << _prev_values[ind] << " -> " << variables[ind]->get_value() << std::endl;
+  //   // }
+  // }
 
   double score = 0;
   for(uint indRule = 0; indRule < _instance.p_rules; indRule ++) {
@@ -88,5 +99,18 @@ double MRuleObjective::required_cost( const std::vector< ghost::Variable*>& vari
 
   std::cout << "score: " << score << std::endl;
 
+
+
   return score;
+}
+
+/*-----------------------------------------------------------------------------*/
+void MRuleObjective::conditional_update_data_structures(const std::vector<ghost::Variable*> &variables, int index, int new_value) {
+
+  std::cout << "update v" << index << " -> " << new_value << std::endl;
+
+  /* store the assignment*/
+  // for(uint ind = 0; ind < variables.size(); ind ++) {
+  //   _prev_values[ind] = variables[ind]->get_value();
+  // }
 }

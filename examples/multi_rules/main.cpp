@@ -8,50 +8,64 @@
 
 #include <fstream>
 
-#include <ghost/solver.hpp>
+#include <cstdlib>
 
-#include "model_builder.hpp"
+#include "Solver.hpp"
+#include "Instance.hpp"
+
 
 using namespace std;
+
+/*-----------------------------------------------------------------------------*/
+void readInstanceFile(string filename, LocalSearch::Instance& instance) {
+
+  std::ifstream file(filename);
+
+  uint n_positives, n_negatives;
+  std::string label;
+  file >> n_positives;
+  std::cout << "n positives: " << n_positives << std::endl;
+  for(uint i = 1; i <= n_positives; i ++) {
+    file >> label;
+    instance.positives.push_back(instance.dataset.getRowIndex(label));
+  }
+
+  file >> n_negatives;
+  std::cout << "n negatives: " << n_negatives << std::endl;
+  for(uint i = 1; i <= n_negatives; i ++) {
+    file >> label;
+    instance.negatives.push_back(instance.dataset.getRowIndex(label));
+  }
+
+  file.close();
+
+}
 
 /*-----------------------------------------------------------------------------*/
 int main() {
 
 
-  cout << "hello GHOST" << endl;
+  std::cout << "hello LOLH local search" << std::endl;
 
+  /* random seed initialization */
+  srand(42);
 
-  // Declaring the model builder
-  LPOBuilder builder;
+  LocalSearch::Instance instance;
 
-  // Defining the solver and calling it
-  ghost::Solver<LPOBuilder> solver( builder );
+  instance.p_rules = 3;
+  instance.t = 0.5;
 
-  double cost;
-  std::vector<int> solution;
+  std::string matrix_filename = "../../dataset/Imagine/discrete_matrix.csv";
+  instance.dataset.loadFromCSV(matrix_filename);
+  instance.dataset.computeUniqueVal();
+  std::cout << "done" << std::endl;
 
-  // Run the solver with a 500 microseconds budget
-  // bool found = solver.solve( cost, solution, 500us );
-  // bool found = solver.solve( cost, solution, 1800s );
-  bool found = solver.solve( cost, solution, 600s );
+  /* read the instance (positive and negative examples) from a txt file */
+  std::string instance_filename = "NK_instance.txt";
+  readInstanceFile(instance_filename, instance);
 
-  // After 500 microseconds, the solver will write in cost and solution the best solution it has found.
-  found ? std::cout << "Solution found\n" : std::cout << "Solution not found\n";
-  std::cout << "Cost: " << cost << "\nSolution:\n";
-
-  for( auto v : solution ) {
-    std::cout << " " << v;
-  }
-
-  std::cout << "\n";
-
-  /* export the solution to a file */
-  std::ofstream file("T_sol.txt");
-  file << solution.size();
-  for( auto v : solution ) {
-    file << " " << v;
-  }
-  file.close();
+  Solver solver(instance);
+  solver.solve();
 
   return 0;
 

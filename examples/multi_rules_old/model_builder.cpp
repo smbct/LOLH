@@ -23,7 +23,7 @@ LPOBuilder::LPOBuilder() : ghost::ModelBuilder() {
 
 
   /* read the instance (positive and negative examples) from a txt file */
-  std::string instance_filename = "T_instance.txt";
+  std::string instance_filename = "NK_instance.txt";
 
   std::ifstream file(instance_filename);
 
