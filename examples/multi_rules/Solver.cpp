@@ -14,8 +14,26 @@ void Solver::solve() {
 
   /* random initialization */
   _sol.randomInit();
+  _sol.recomputeScore();
 
   /* local search */
+
+  /* n random moves */
+  for(int ind = 0; ind < 100; ind ++) {
+
+    int varIndex = rand()%_sol.size();
+
+    _sol.updateVariable(varIndex, rand()%_instance.p_rules);
+
+    std::cout << "move " << ind << " done!" << std::endl;
+    std::cout << "cost: " << _sol.score() << std::endl;
+
+    // _sol.recomputeScore();
+    // std::cout << "cost re-computed: " << _sol.score() << std::endl;
+
+  }
+
+  _sol.recomputeScore();
 
   /* print the solution */
   for( int varIndex = 0; varIndex < _sol.size(); varIndex ++ ) {
@@ -23,7 +41,7 @@ void Solver::solve() {
   }
   std::cout << std::endl;
 
-  std::cout << "cost: " << _sol.computeScore() << std::endl;
+  std::cout << "cost: " << _sol.score() << std::endl;
 
 }
 
