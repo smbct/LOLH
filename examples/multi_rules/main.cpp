@@ -53,7 +53,8 @@ int main() {
   LocalSearch::Instance instance;
 
   instance.p_rules = 3;
-  instance.t = 0.5;
+  // instance.t = 0.5;
+  instance.t = 0.3;
 
   std::string matrix_filename = "../../dataset/Imagine/discrete_matrix.csv";
   instance.dataset.loadFromCSV(matrix_filename);
@@ -61,11 +62,12 @@ int main() {
   std::cout << "done" << std::endl;
 
   /* read the instance (positive and negative examples) from a txt file */
-  std::string instance_filename = "NK_instance.txt";
+  std::string instance_filename = "T_instance.txt";
   readInstanceFile(instance_filename, instance);
 
   Solver solver(instance);
   solver.solve();
+  solver.saveSolution("T_temp_sol.txt");
 
   return 0;
 
