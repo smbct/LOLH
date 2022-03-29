@@ -23,23 +23,28 @@ void Solver::solve() {
 
     int varIndex = rand()%_sol.size();
 
+    std::cout << "move " << ind << std::endl;
     _sol.updateVariable(varIndex, rand()%_instance.p_rules);
+    std::cout << "move done" << std::endl << std::endl;
 
-    std::cout << "move " << ind << " done!" << std::endl;
+
     std::cout << "cost: " << _sol.score() << std::endl;
 
-    // _sol.recomputeScore();
-    // std::cout << "cost re-computed: " << _sol.score() << std::endl;
+    if(ind % 10 == 0) {
+      _sol.recomputeScore();
+      std::cout << std::endl << "cost re-computed: " << _sol.score() << std::endl << std::endl;
+    }
 
   }
 
+  std::cout << std::endl << "recompute solution" << std::endl << std::endl;
   _sol.recomputeScore();
 
   /* print the solution */
-  for( int varIndex = 0; varIndex < _sol.size(); varIndex ++ ) {
-    std::cout << _sol.getValue(varIndex) << " ";
-  }
-  std::cout << std::endl;
+  // for( int varIndex = 0; varIndex < _sol.size(); varIndex ++ ) {
+  //   std::cout << _sol.getValue(varIndex) << " ";
+  // }
+  // std::cout << std::endl;
 
   std::cout << "cost: " << _sol.score() << std::endl;
 
