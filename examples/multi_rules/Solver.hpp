@@ -23,6 +23,18 @@ class Solver {
     void solve();
 
     /*!
+     * \brief perform best improvement search on the solution
+     * \return true if the solution score has been improved
+     */
+    bool bestImprovement();
+
+    /*!
+     * \brief perform first improvement search on the solution
+     * \return true if the solution score has been improved
+     */
+    bool firstImprovement();
+
+    /*!
      * \brief save the solution into a file
      * \param filename name of the file
      */

@@ -80,9 +80,7 @@ void Solution::updateVariable(int varInd, int value) {
   /* 1) the example was a positive example and is not anymore */
   /* 2) the example was not a positive example and it is now one */
 
-  /* update the score only for the atoms which do not verify the example values */
-
-  /* 1) -> varInd is no longer a positive example for the rule of index "_var[varInd]" */
+  /* 1) -> varInd is no longer a positive example for the rule of index "_var[varInd]", it is now a negative example */
   int ruleIndex = _var[varInd];
 
   // _selectedAtoms[ruleIndex].clear();
@@ -92,16 +90,15 @@ void Solution::updateVariable(int varInd, int value) {
 
     int dataVal = _instance.dataset.getData(_instance.positives[varInd], atom.first);
 
-
-    double prevScore = static_cast<double>(_atomErrors[ruleIndex][atomInd].second)/static_cast<double>(_instance.negatives.size());
+    double prevScore = static_cast<double>(_atomErrors[ruleIndex][atomInd].second)/static_cast<double>(_nNegatives[ruleIndex]);
     prevScore -= static_cast<double>(_atomErrors[ruleIndex][atomInd].first)/static_cast<double>(_nPositives[ruleIndex]);
-
-    double newScore = static_cast<double>(_atomErrors[ruleIndex][atomInd].second)/static_cast<double>(_instance.negatives.size());
 
     if(atom.second != dataVal) {
       _atomErrors[ruleIndex][atomInd].first -= 1;
+      _atomErrors[ruleIndex][atomInd].second += 1;
     }
 
+    double newScore = static_cast<double>(_atomErrors[ruleIndex][atomInd].second)/static_cast<double>(_nNegatives[ruleIndex]+1);
     newScore -= static_cast<double>(_atomErrors[ruleIndex][atomInd].first)/static_cast<double>(_nPositives[ruleIndex]-1);
 
     /* check if the new score make the atom selected, and update the solution accordingly */
@@ -116,9 +113,9 @@ void Solution::updateVariable(int varInd, int value) {
 
   }
 
-  /* update the number of positive examples for this rule */
+  /* update the number of positive and negative examples for this rule */
   _nPositives[ruleIndex] -= 1;
-
+  _nNegatives[ruleIndex] += 1;
 
 
 
@@ -132,17 +129,16 @@ void Solution::updateVariable(int varInd, int value) {
     auto atom = _atoms[atomInd];
     int dataVal = _instance.dataset.getData(_instance.positives[varInd], atom.first);
 
-
-    double prevScore = static_cast<double>(_atomErrors[ruleIndex][atomInd].second)/static_cast<double>(_instance.negatives.size());
+    double prevScore = static_cast<double>(_atomErrors[ruleIndex][atomInd].second)/static_cast<double>(_nNegatives[ruleIndex]);
     prevScore -= static_cast<double>(_atomErrors[ruleIndex][atomInd].first)/static_cast<double>(_nPositives[ruleIndex]);
-
-    double newScore = static_cast<double>(_atomErrors[ruleIndex][atomInd].second)/static_cast<double>(_instance.negatives.size());
 
     /* update the atom positive error */
     if(atom.second != dataVal) {
       _atomErrors[ruleIndex][atomInd].first += 1;
+      _atomErrors[ruleIndex][atomInd].second -= 1;
     }
 
+    double newScore = static_cast<double>(_atomErrors[ruleIndex][atomInd].second)/static_cast<double>(_nNegatives[ruleIndex]-1);
     newScore -= static_cast<double>(_atomErrors[ruleIndex][atomInd].first)/static_cast<double>(_nPositives[ruleIndex]+1);
 
     /* check if the new score make the atom unselected, and update the solution accordingly */
@@ -159,13 +155,14 @@ void Solution::updateVariable(int varInd, int value) {
   }
 
 
-  /* update the number of positive examples for this rule */
+  /* update the number of positive and negative examples for this rule */
   _nPositives[ruleIndex] += 1;
+  _nNegatives[ruleIndex] -= 1;
 
   ruleIndex = -1;
 
 
-  
+
 
 
   /* perform the update */
@@ -181,7 +178,7 @@ void Solution::updateVariable(int varInd, int value) {
     double ruleScore = 0.;
 
     for(int atomIndex : _selectedAtoms[ruleInd]) {
-      double atomScore = static_cast<double>(_atomErrors[ruleInd][atomIndex].second)/static_cast<double>(_instance.negatives.size());
+      double atomScore = static_cast<double>(_atomErrors[ruleInd][atomIndex].second)/static_cast<double>(_nNegatives[ruleInd]);
       atomScore -= static_cast<double>(_atomErrors[ruleInd][atomIndex].first)/static_cast<double>(_nPositives[ruleInd]);
 
       _atomScores[ruleInd][atomIndex] = atomScore;
@@ -211,29 +208,23 @@ void Solution::recomputeScore() {
     _score += recomputeRuleScore(ruleIndex);
   }
 
-  std::cout << "recomputed score: " << _score << std::endl;
-
-  if(prevScore != _score) {
-    std::cout << std::endl << "!!!!!! error scores are not equal !!!!!! " << std::endl << std::endl;
-  }
-
 }
 
 /*----------------------------------------------------------------------------*/
 double Solution::recomputeRuleScore(int ruleIndex) {
 
-  std::cout << "recomputation of rule " << ruleIndex << " score !" << std::endl;
-
-  int nPosPrev = _nPositives[ruleIndex];
-
   _nPositives[ruleIndex] = 0;
+  _nNegatives[ruleIndex] = _instance.negatives.size();
 
-  /* compute the positive examples selected for this rule */
-  std::vector<uint> positives;
+  /* compute the positive and negative examples selected for this rule */
+  std::vector<uint> positives, negatives;
   for(int varInd = 0; varInd < _var.size(); varInd ++) {
     if(_var[varInd] == ruleIndex) {
       positives.push_back(_instance.positives[varInd]);
       _nPositives[ruleIndex] ++; /* one more positive exampe */
+    } else {
+      negatives.push_back(_instance.positives[varInd]);
+      _nNegatives[ruleIndex] ++; /* one more negative exampe */
     }
   }
 
@@ -243,19 +234,29 @@ double Solution::recomputeRuleScore(int ruleIndex) {
 
     _atomErrors[ruleIndex][atomInd] = std::pair<uint,uint>(0,0);
 
-    for(uint pos : positives) {
-      uint val = _instance.dataset.getData(pos, atom.first);
+    for(uint positive : positives) {
+      uint val = _instance.dataset.getData(positive, atom.first);
       if(val != atom.second) {
         _atomErrors[ruleIndex][atomInd].first ++;
       }
     }
 
-    for(uint neg: _instance.negatives) {
-      uint val = _instance.dataset.getData(neg, atom.first);
+    /* take into account the positive examples not selected for this rule as negative examples */
+    for(uint negative : negatives) {
+      uint val = _instance.dataset.getData(negative, atom.first);
       if(val != atom.second) {
         _atomErrors[ruleIndex][atomInd].second ++;
       }
     }
+
+    for(uint negative : _instance.negatives) {
+      uint val = _instance.dataset.getData(negative, atom.first);
+      if(val != atom.second) {
+        _atomErrors[ruleIndex][atomInd].second ++;
+      }
+    }
+
+
 
   }
 
@@ -266,7 +267,7 @@ double Solution::recomputeRuleScore(int ruleIndex) {
 
   for(uint atomInd = 0; atomInd < _atoms.size(); atomInd ++) {
 
-    double atomScore = static_cast<double>(_atomErrors[ruleIndex][atomInd].second)/static_cast<double>(_instance.negatives.size());
+    double atomScore = static_cast<double>(_atomErrors[ruleIndex][atomInd].second)/static_cast<double>(_nNegatives[ruleIndex]);
     atomScore -= static_cast<double>(_atomErrors[ruleIndex][atomInd].first)/static_cast<double>(_nPositives[ruleIndex]);
 
     _atomScores[ruleIndex][atomInd] = atomScore;
@@ -278,18 +279,7 @@ double Solution::recomputeRuleScore(int ruleIndex) {
 
   }
 
-  std::cout << _selectedAtoms[ruleIndex].size() << " atoms selected for rule " << ruleIndex << std::endl;
-
   double ruleScore = sumScore / static_cast<double>(_selectedAtoms[ruleIndex].size());
-
-  std::cout << " debug rule " << ruleIndex << " score: " << ruleScore << std::endl;
-
-  std::cout << "selected atoms: ";
-  for(int atomInd : _selectedAtoms[ruleIndex]) {
-    std::cout << atomInd << " ";
-  }
-  std::cout << std::endl;
-
 
   return ruleScore;
 
