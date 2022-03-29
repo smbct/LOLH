@@ -30,11 +30,11 @@ class Solution {
     double score();
 
     /*!
-     * \brief compute the score of one specific rule
+     * \brief recompute the score of one specific rule
      * \param ruleIndex the index of the rule
      * \return the score of the rule
      */
-    double computeRuleScore(int ruleIndex);
+    double recomputeRuleScore(int ruleIndex);
 
     /*!
      * \brief random initialization of the values
@@ -86,15 +86,19 @@ class Solution {
     /* the positive and negative errors of the atoms for each rules */
     std::vector<std::vector<std::pair<uint,uint>>> _atomErrors;
 
+    /* the score of the atoms for each rules */
+    std::vector<std::vector<double>> _atomScores;
+
     /* sum of the scores of the atoms selected for each rule */
     std::vector<double> _sumAtomScores;
 
     /* set of indexes for the atoms selected for the body of the rules */
     std::vector<std::set<int>> _selectedAtoms;
 
-    /* number of atoms currently selected in the rules body */
-    std::vector<int> _nAtomsBody;
-
     /* number of positive examples for each rule, deduced from the current assignment */
     std::vector<int> _nPositives;
+
+    /* number of negative examples for each rule, deduced from the current assignment (if the positive example is not assigned to the rule, it is considered as negative) */
+    std::vector<int> _nNegatives;
+
 };
