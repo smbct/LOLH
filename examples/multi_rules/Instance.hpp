@@ -5,9 +5,19 @@
 
 namespace LocalSearch {
 
-struct Instance {
+class Instance {
 
   public:
+
+    /*!
+     * \brief compute the score of an atom
+     * \param atom the atom
+     * \return the score of the atom
+     */
+    double computeAtomScore(std::pair<int,int> atom);
+
+  public:
+    
     int p_rules; /* number of rules to infer */
     double t; /* selection thresold for the rule atoms */
     DataFrame<uint> dataset; /* dataset of the problem */

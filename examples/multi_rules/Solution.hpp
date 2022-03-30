@@ -61,6 +61,23 @@ class Solution {
      */
     void updateVariable(int varInd, int value);
 
+    /*!
+     * \brief random modifications of the solution
+     * \param nb the number of random modifications to perform
+     */
+    void disruption(int nb);
+
+    /*!
+     * \brief initialize from the value of another solution
+     * \param other the solution to copy from
+     */
+    void copyFrom(Solution& other);
+
+    /*!
+     * \brief assign the variables of the solution from the content of a file
+     * \param filename the name of the file
+     */
+    void assignFromFile(std::string filename);
 
   private: /* private methods */
 

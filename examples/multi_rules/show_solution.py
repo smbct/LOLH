@@ -44,8 +44,10 @@ df_macrotypes = pd.read_csv('../../dataset/Imagine/cell_types_macro.csv', index_
 df_macrotypes.rename(columns={'cellType_macro': 'Label'}, inplace=True)
 
 # initialization of the classification instance: classification of the NK cells
-celltype = 'NK'
-celltype = 'T'
+# celltype = 'NK'
+# instance = Instance.create_cluster_instance(df_discrete.copy(deep=False), df_celltypes, celltype)
+# celltype = 'T'
+celltype = 'B'
 instance = Instance.create_cluster_instance(df_discrete.copy(deep=False), df_macrotypes, celltype)
 
 print('Classification of the NK cells')
@@ -54,7 +56,7 @@ print('- ', instance.n_negatives(), ' negative examples')
 print('\n')
 
 # load the solution
-file = open('T_sol.txt', 'r')
+file = open('B_sol.txt', 'r')
 content = file.read().split(' ')
 content = content[1:]
 sol_values = [int(elt) for elt in content]
