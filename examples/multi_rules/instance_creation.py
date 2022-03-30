@@ -38,7 +38,7 @@ df_umap = pd.read_csv(filename, index_col = 0)
 # read the seurat cell types
 df_celltypes = pd.read_csv('../../dataset/Imagine/cell_types.csv', index_col = 0)
 df_celltypes.rename(columns={'cellType_final': 'Label'}, inplace=True)
-# print(df_celltypes.head())
+print(df_celltypes)
 
 df_macrotypes = pd.read_csv('../../dataset/Imagine/cell_types_macro.csv', index_col = 0)
 df_macrotypes.rename(columns={'cellType_macro': 'Label'}, inplace=True)
@@ -47,12 +47,12 @@ df_macrotypes.rename(columns={'cellType_macro': 'Label'}, inplace=True)
 # celltype = 'NK'
 # instance = Instance.create_cluster_instance(df_discrete.copy(deep=False), df_celltypes, celltype)
 
-celltype = 'T'
+celltype = 'B'
 instance = Instance.create_cluster_instance(df_discrete.copy(deep=False), df_macrotypes, celltype)
 
 
 # export the instance to a file
-file = open('T_instance.txt', 'w')
+file = open('B_instance.txt', 'w')
 file.write(str(len(instance._pos_samples)) + ' ')
 for ind in range(len(instance._pos_samples)):
     file.write(instance._pos_samples[ind])
@@ -66,6 +66,18 @@ for ind in range(len(instance._neg_samples)):
     if ind < len(instance._neg_samples)-1:
         file.write(' ')
 file.close()
+
+# create a solution assignment with the naive and the B cells
+file = open('B_assignment.txt', 'w')
+file.write(str(len(instance._pos_samples)))
+for pos_example in instance._pos_samples:
+    file.write(' ')
+    if df_celltypes['Label'][pos_example] == 'B-naive':
+        file.write('0')
+    else:
+        file.write('1')
+file.close()
+
 
 print('Classification of the NK cells')
 print('- ', instance.n_positives(), ' positive examples')

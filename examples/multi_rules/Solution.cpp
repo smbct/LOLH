@@ -1,6 +1,7 @@
 #include "Solution.hpp"
 
 #include <iostream>
+#include <fstream>
 
 /*----------------------------------------------------------------------------*/
 Solution::Solution(LocalSearch::Instance& instance): _instance(instance)
@@ -13,6 +14,8 @@ Solution::Solution(LocalSearch::Instance& instance): _instance(instance)
 
   int atomIndex = 0;
 
+
+
   /* creation of the list of atoms */
   for(uint colInd = 0; colInd < _instance.dataset.nColumns(); colInd ++) {
 
@@ -21,9 +24,14 @@ Solution::Solution(LocalSearch::Instance& instance): _instance(instance)
     _atomIndexes[colInd].resize(nValues);
 
     for(uint value = 0; value < nValues; value ++) {
-      _atoms.push_back(std::pair<uint,uint>(colInd, value));
-      _atomIndexes[colInd][value] = atomIndex;
-      atomIndex += 1;
+
+      double atomScore = _instance.computeAtomScore(std::pair<int,int>(colInd,value));
+      if(atomScore >= 0) {
+        _atoms.push_back(std::pair<uint,uint>(colInd, value));
+        _atomIndexes[colInd][value] = atomIndex;
+        atomIndex += 1;
+      }
+
     }
   }
 
@@ -46,6 +54,8 @@ Solution::Solution(LocalSearch::Instance& instance): _instance(instance)
   for(int ruleInd = 0; ruleInd < _instance.p_rules; ruleInd ++) {
     _atomScores[ruleInd].resize(_atoms.size());
   }
+
+  _score = -1.;
 
 }
 
@@ -283,4 +293,40 @@ double Solution::recomputeRuleScore(int ruleIndex) {
 
   return ruleScore;
 
+}
+
+/*----------------------------------------------------------------------------*/
+void Solution::disruption(int nb) {
+
+  for(int i = 1; i <= nb; i ++) {
+    int varInd = rand()%_var.size();
+    int value = rand()%_instance.p_rules;
+    if(_var[varInd] == value) {
+      value ++;
+      value = value % _instance.p_rules;
+    }
+    updateVariable(varInd, value);
+  }
+
+}
+
+/*----------------------------------------------------------------------------*/
+void Solution::copyFrom(Solution& other) {
+  _var = other._var;
+  _score = other._score;
+}
+
+/*----------------------------------------------------------------------------*/
+void Solution::assignFromFile(std::string filename) {
+
+  std::ifstream file(filename);
+
+  int nb = 0;
+  file >> nb;
+  for(int varInd = 0; varInd < _var.size(); varInd ++) {
+    file >> nb;
+    _var[varInd] = nb;
+  }
+
+  file.close();
 }

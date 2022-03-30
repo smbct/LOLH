@@ -14,7 +14,10 @@ void Solver::solve() {
 
   /* random initialization */
   _sol.randomInit();
+
+  _sol.assignFromFile("B_assignment.txt");
   _sol.recomputeScore();
+  std::cout << "cost: " << _sol.score() << std::endl;
 
   /* local search */
 
@@ -31,16 +34,54 @@ void Solver::solve() {
   //
   // }
 
-  bool improved = true;
+  bool stop = true;
+  bool improved = false;
+
   int nbIt = 0;
-  while(improved) {
+  int nbRestart = 0;
+  int nbFullRestart = 0;
+
+  Solution bestSol(_instance);
+
+  while(!stop) {
+
     // improved = firstImprovement();
 
-    improved = bestImprovement();
+    // if(!improved) {
+      improved = bestImprovement();
+    // }
+
+    if(!improved) {
+
+      if(_sol.score() > bestSol.score()) {
+        bestSol.copyFrom(_sol);
+      }
+
+      if(nbRestart < 4) {
+        _sol.disruption(50);
+        nbRestart ++;
+      } else {
+        if(nbFullRestart < 10) {
+          nbRestart = 0;
+          nbFullRestart ++;
+          _sol.randomInit();
+          _sol.recomputeScore();
+        } else {
+          stop = true;
+        }
+      }
+
+    }
+
+    // if(nbIt % 20 == 0) {
+    //
+    // }
 
     std::cout << "score: " << _sol.score() << std::endl;
+    std::cout << " best so far: " << bestSol.score() << std::endl;
     nbIt += 1;
   }
+
   std::cout << "nb iterations: " << nbIt << std::endl;
 
   std::cout << std::endl << "recompute solution" << std::endl << std::endl;
@@ -52,7 +93,14 @@ void Solver::solve() {
   }
   std::cout << std::endl;
 
-  std::cout << "cost: " << _sol.score() << std::endl;
+  std::cout << "final score: " << _sol.score() << std::endl;
+
+  if(_sol.score() < bestSol.score()) {
+    _sol.copyFrom(bestSol);
+  }
+
+  saveSolution("B_sol.txt");
+  std::cout << "solution saved!" << std::endl;
 
 }
 
